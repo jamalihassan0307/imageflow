@@ -1,3 +1,12 @@
+## 1.0.1
+
+* 🐛 Fixed placeholder and progress indicator conflict
+* 🎨 Improved example app with interactive features
+* 📱 Added visibility threshold control
+* 🔄 Enhanced error handling and display
+* ⚡ Performance improvements in image loading
+* 📚 Updated documentation
+
 ## 1.0.0
 
 Initial release of ImageFlow with the following features:
