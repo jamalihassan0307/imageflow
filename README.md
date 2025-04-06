@@ -100,6 +100,17 @@ An advanced image loader for Flutter with caching, placeholders, and progressive
 - SVG rendering
 - Extensible format handlers
 
+### Android Setup
+
+Add the following permission to your Android Manifest (`android/app/src/main/AndroidManifest.xml`):
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+This permission is required for loading images from the internet.
+
+
 ## 🚀 Getting Started
 
 Add this to your package's `pubspec.yaml` file:
@@ -108,6 +119,8 @@ Add this to your package's `pubspec.yaml` file:
 dependencies:
   imageflow: ^1.0.3
 ```
+
+
 
 ## 💻 Usage Examples
 

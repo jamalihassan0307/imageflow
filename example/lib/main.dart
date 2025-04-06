@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:imageflow/imageflow.dart';
+import 'dart:io';
+import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
+
+// Add HTTP override for debug mode
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() {
+  // Enable HTTP override in debug mode
+  if (kDebugMode) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
+  
   runApp(const MyApp());
 }
 
@@ -36,6 +53,36 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _showPlaceholder = true;
   double _visibilityFraction = 0.1;
   bool _isGridView = true;
+  bool _hasInternetConnection = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkInternetConnection();
+  }
+
+  Future<void> _checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      final hasConnection = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      developer.log('Internet connection: $hasConnection');
+      setState(() {
+        _hasInternetConnection = hasConnection;
+      });
+    } on SocketException catch (e) {
+      developer.log('Error checking internet connection: $e');
+      setState(() {
+        _hasInternetConnection = false;
+      });
+    }
+  }
+
+  Future<void> _retryLoadingImages() async {
+    await _checkInternetConnection();
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +213,12 @@ class _MyHomePageState extends State<MyHomePage> {
               tag: image.url,
               child: LazyCacheImage(
                 imageUrl: image.url,
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
                 placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
-                errorWidget: _buildCustomErrorWidget(),
+                errorWidget: _buildCustomErrorWidget(
+                  onRetry: () => _retryLoadingImages(),
+                  error: 'Failed to load image. Please try again.',
+                ),
                 maxWidth: 600,
                 maxHeight: 800,
                 visibilityFraction: _visibilityFraction,
@@ -176,22 +226,26 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   image.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   image.description,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 12,
+                      ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -226,37 +280,57 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildCustomErrorWidget() {
+  Widget _buildCustomErrorWidget({VoidCallback? onRetry, String? error}) {
     return Container(
       color: Colors.grey[100],
+      padding: const EdgeInsets.all(8),
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-          
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Error loading image',
-              style: TextStyle(
-                color: Colors.red[700],
-                fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 40,
+                color: Colors.red,
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Please check your internet connection',
-              style: TextStyle(
-                color: Colors.red[400],
-                fontSize: 12,
+              const SizedBox(height: 8),
+              Text(
+                'Error loading image',
+                style: TextStyle(
+                  color: Colors.red[700],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              if (error != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  error,
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontSize: 11,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 32,
+                child: ElevatedButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh, size: 16),
+                  label: const Text(
+                    'Retry',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -277,33 +351,18 @@ class DemoImage {
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://raw.githubusercontent.com/flutter/website/main/src/assets/images/flutter-logo-sharing.png',
-    title: 'Flutter Logo',
-    description: 'Official Flutter logo from GitHub',
+    url: 'https://i.imgur.com/RGLtxuU.jpeg',
+    title: 'Nature Image 1',
+    description: 'Beautiful landscape from Imgur',
   ),
   const DemoImage(
-    url: 'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
-    title: 'Dash Animation',
-    description: 'Flutter mascot Dash in an animated GIF',
+    url: 'https://i.imgur.com/L7YoqTN.jpeg',
+    title: 'Nature Image 2',
+    description: 'Mountain scenery from Imgur',
   ),
   const DemoImage(
-    url: 'https://storage.googleapis.com/cms-storage-bucket/70760bf1e88b184bb1bc.png',
-    title: 'Flutter Framework',
-    description: 'Flutter framework illustration',
-  ),
-  const DemoImage(
-    url: 'https://docs.flutter.dev/assets/images/docs/ui/layout/layout-4.png',
-    title: 'Flutter Layout',
-    description: 'Flutter layout example image',
-  ),
-  const DemoImage(
-    url: 'https://docs.flutter.dev/assets/images/docs/ui/material/cards.png',
-    title: 'Material Cards',
-    description: 'Example of Material Design cards in Flutter',
-  ),
-  const DemoImage(
-    url: 'https://docs.flutter.dev/assets/images/docs/ui/layout/row-diagram.png',
-    title: 'Row Layout',
-    description: 'Diagram showing Flutter row layout',
+    url: 'https://i.imgur.com/FWGhbGz.jpeg',
+    title: 'Nature Image 3',
+    description: 'Forest view from Imgur',
   ),
 ];
