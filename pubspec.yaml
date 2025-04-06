@@ -16,6 +16,8 @@ dependencies:
   connectivity_plus: ^5.0.2
   flutter_cache_manager: ^3.3.1
   visibility_detector: ^0.4.0+2
+  path_provider: ^2.1.2
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +29,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  uses-material-design: true
 
   # To add assets to your package, add an assets section, like this:
   # assets:
