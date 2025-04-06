@@ -60,34 +60,97 @@ dependencies:
   imageflow: ^1.0.1
 ```
 
-## 💻 Usage
+## 💻 Usage Examples
 
+### Basic Usage
 ```dart
-import 'package:imageflow/imageflow.dart';
-
-// Basic usage
-ImageFlow(
-  url: 'https://example.com/image.jpg',
-)
-
-// Advanced usage with all features
-ImageFlow(
-  url: 'https://example.com/image.jpg',
-  placeholder: 'assets/placeholder.png',
-  errorWidget: (context, error) => Icon(Icons.error),
-  progressIndicatorBuilder: (context, progress) => CircularProgressIndicator(),
-  cacheManager: CustomCacheManager(),
-  preload: true,
+LazyCacheImage(
+  imageUrl: 'https://example.com/image.jpg',
 )
 ```
 
-## 📚 Documentation
+### With Custom Placeholder
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/image.jpg',
+  placeholder: const Center(
+    child: CircularProgressIndicator(),
+  ),
+)
+```
 
-For detailed documentation and examples, visit our [Wiki](https://github.com/yourusername/imageflow/wiki).
+### With Error Handling
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/image.jpg',
+  errorWidget: const Icon(
+    Icons.error_outline,
+    color: Colors.red,
+  ),
+)
+```
+
+### Advanced Usage
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/image.jpg',
+  fit: BoxFit.cover,
+  maxWidth: 300,
+  maxHeight: 300,
+  visibilityFraction: 0.1,
+  cacheDuration: const Duration(days: 7),
+)
+```
+
+## 🎯 Use Cases
+
+### 1. Image Lists & Grids
+Perfect for optimizing performance in scrolling lists:
+```dart
+ListView.builder(
+  itemBuilder: (context, index) => LazyCacheImage(
+    imageUrl: images[index],
+    visibilityFraction: 0.1,
+  ),
+)
+```
+
+### 2. SVG Support
+Automatically handles SVG images:
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/vector.svg',
+  fit: BoxFit.contain,
+)
+```
+
+### 3. Offline Support
+Images remain available offline after first load:
+```dart
+LazyCacheImage(
+  imageUrl: url,
+  placeholder: const Text('Loading from cache...'),
+)
+```
+
+### 4. Cache Management
+Easy cache control:
+```dart
+final cacheProvider = CacheProvider();
+
+// Clear specific image
+await cacheProvider.clearCache(imageUrl);
+
+// Clear all cached images
+await cacheProvider.clearAllCache();
+
+// Get cache size
+final size = await cacheProvider.getCacheSize();
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) first.
+Contributions are welcome! Please read our contributing guidelines first.
 
 ## 📄 License
 
