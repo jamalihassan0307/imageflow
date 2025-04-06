@@ -17,7 +17,7 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   if (kDebugMode) {
     HttpOverrides.global = MyHttpOverrides();
     developer.log('Debug mode: Using custom HTTP client configuration');
@@ -88,8 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _checkInternetConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com');
-      final hasConnection =
-          result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      final hasConnection = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
       developer.log('Internet connection check: $hasConnection');
       if (mounted) {
         setState(() {
@@ -241,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildImageCard(DemoImage image) {
+    print("image.url${image.url}");
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -251,16 +251,15 @@ class _MyHomePageState extends State<MyHomePage> {
               child: LazyCacheImage(
                 imageUrl: image.url,
                 fit: BoxFit.cover,
-                placeholder:
-                    _showPlaceholder ? _buildCustomPlaceholder() : null,
+                placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
                 errorWidget: _buildCustomErrorWidget(
                   onRetry: () => _retryLoadingImages(),
-                  error: !_hasInternetConnection
+                  error: !_hasInternetConnection 
                       ? 'No internet connection'
                       : 'Failed to load image. Please try again.',
                 ),
-                maxWidth: 600,
-                maxHeight: 800,
+                // maxWidth: 600,
+                // maxHeight: 800,
                 visibilityFraction: _visibilityFraction,
               ),
             ),
@@ -379,18 +378,18 @@ class DemoImage {
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://i.imgur.com/RGLtxuU.jpeg',
-    title: 'Nature Image 1',
-    description: 'Beautiful landscape from Imgur',
+    url: 'https://picsum.photos/400/600?random=1',
+    title: 'Random Image 1',
+    description: 'Random image from Picsum Photos',
   ),
   const DemoImage(
-    url: 'https://i.imgur.com/L7YoqTN.jpeg',
-    title: 'Nature Image 2',
-    description: 'Mountain scenery from Imgur',
+    url: 'https://picsum.photos/400/600?random=2',
+    title: 'Random Image 2',
+    description: 'Random image from Picsum Photos',
   ),
   const DemoImage(
-    url: 'https://i.imgur.com/FWGhbGz.jpeg',
-    title: 'Nature Image 3',
-    description: 'Forest view from Imgur',
+    url: 'https://picsum.photos/400/600?random=3',
+    title: 'Random Image 3',
+    description: 'Random image from Picsum Photos',
   ),
 ];
