@@ -5,9 +5,9 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-import '../models/image_config.dart';
+// import '../models/image_config.dart';
 import '../utils/image_utils.dart';
-import '../providers/cache_provider.dart';
+// import '../providers/cache_provider.dart';
 import '../providers/custom_cache_manager.dart';
 
 /// A widget that displays a network image with lazy loading and caching capabilities
