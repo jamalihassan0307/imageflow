@@ -1,3 +1,14 @@
+## 1.0.7
+
+* 🔧 Fixed offline mode image loading issues
+* ⚡ Improved cache management and status tracking
+* 🎨 Enhanced error handling in offline mode
+* 🚀 Better handling of image prefetching and caching
+* 📱 Improved UI feedback for cached images
+* 🔄 Added retry mechanism for failed image loads
+* 🌐 Better network state handling and offline mode transitions
+* 📝 Updated documentation and examples
+
 ## 1.0.6
 
 * 🖼️ Added support for adaptive image quality loading with low-res to high-res transitions
