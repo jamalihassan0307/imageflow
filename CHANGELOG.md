@@ -1,3 +1,11 @@
+## 1.0.4
+
+* 🔧 Improved HTTP client configuration in debug mode
+* 🐛 Fixed image loading issues in debug mode
+* ⚡ Enhanced error handling and retry mechanism
+* 🔄 Added automatic cache clearing on startup
+* 📝 Added better debug logging
+
 ## 1.0.3
 
 * 🔄 Updated dependencies to latest versions
