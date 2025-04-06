@@ -6,7 +6,7 @@ import 'custom_cache_manager.dart';
 /// Provider class for managing image caching
 class CacheProvider {
   static final CacheProvider _instance = CacheProvider._internal();
-  
+
   factory CacheProvider() {
     return _instance;
   }
@@ -42,4 +42,4 @@ class CacheProvider {
   Future<String> getCachePath() async {
     return await _cacheManager.getCachePath();
   }
-} 
+}

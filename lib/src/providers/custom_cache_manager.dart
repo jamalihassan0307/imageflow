@@ -17,13 +17,14 @@ class CustomCacheManager extends CacheManager {
     return _instance!;
   }
 
-  CustomCacheManager._() : super(Config(
-    key,
-    stalePeriod: maxAgeCacheObject,
-    maxNrOfCacheObjects: maxNrOfCacheObjects,
-    repo: JsonCacheInfoRepository(databaseName: key),
-    fileService: HttpFileService(),
-  ));
+  CustomCacheManager._()
+      : super(Config(
+          key,
+          stalePeriod: maxAgeCacheObject,
+          maxNrOfCacheObjects: maxNrOfCacheObjects,
+          repo: JsonCacheInfoRepository(databaseName: key),
+          fileService: HttpFileService(),
+        ));
 
   Future<String> getCachePath() async {
     final directory = await getTemporaryDirectory();
@@ -50,4 +51,4 @@ class CustomCacheManager extends CacheManager {
   String getCacheKey(String url) {
     return '${key}_$url';
   }
-} 
+}

@@ -46,4 +46,4 @@ class ImageUtils {
   static bool isGifUrl(String url) {
     return url.toLowerCase().endsWith('.gif');
   }
-} 
+}

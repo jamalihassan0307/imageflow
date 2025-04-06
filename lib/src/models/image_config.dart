@@ -4,25 +4,25 @@ import 'package:flutter/widgets.dart';
 class ImageConfig {
   /// The URL of the image to load
   final String imageUrl;
-  
+
   /// How to inscribe the image into the space allocated during layout
   final BoxFit fit;
-  
+
   /// Widget to show while the image is loading
   final Widget? placeholder;
-  
+
   /// Widget to show if there is an error loading the image
   final Widget? errorWidget;
-  
+
   /// Whether to enable adaptive quality loading
   final bool enableAdaptiveLoading;
-  
+
   /// Duration to keep the image in cache
   final Duration cacheDuration;
-  
+
   /// Maximum width to load the image at
   final double? maxWidth;
-  
+
   /// Maximum height to load the image at
   final double? maxHeight;
 
@@ -53,10 +53,11 @@ class ImageConfig {
       fit: fit ?? this.fit,
       placeholder: placeholder ?? this.placeholder,
       errorWidget: errorWidget ?? this.errorWidget,
-      enableAdaptiveLoading: enableAdaptiveLoading ?? this.enableAdaptiveLoading,
+      enableAdaptiveLoading:
+          enableAdaptiveLoading ?? this.enableAdaptiveLoading,
       cacheDuration: cacheDuration ?? this.cacheDuration,
       maxWidth: maxWidth ?? this.maxWidth,
       maxHeight: maxHeight ?? this.maxHeight,
     );
   }
-} 
+}

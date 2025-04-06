@@ -98,10 +98,11 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
       maxWidthDiskCache: widget.maxWidth?.toInt(),
       maxHeightDiskCache: widget.maxHeight?.toInt(),
       key: ValueKey(widget.imageUrl),
-      progressIndicatorBuilder: widget.placeholder == null 
-          ? (context, url, progress) => _buildProgressIndicator(context, progress)
+      progressIndicatorBuilder: widget.placeholder == null
+          ? (context, url, progress) =>
+              _buildProgressIndicator(context, progress)
           : null,
-      placeholder: widget.placeholder != null 
+      placeholder: widget.placeholder != null
           ? (context, url) => widget.placeholder!
           : null,
       errorWidget: (context, url, error) => _buildErrorWidget(context, error),
@@ -118,12 +119,13 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
 
   Widget _buildPlaceholder(BuildContext context) {
     if (widget.placeholder != null) return widget.placeholder!;
-    
+
     return Container(
       color: Colors.grey[200],
       child: Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+          valueColor:
+              AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
         ),
       ),
     );
@@ -143,12 +145,14 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
     );
   }
 
-  Widget _buildProgressIndicator(BuildContext context, DownloadProgress progress) {
+  Widget _buildProgressIndicator(
+      BuildContext context, DownloadProgress progress) {
     return Center(
       child: CircularProgressIndicator(
         value: progress.progress,
-        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+        valueColor:
+            AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
       ),
     );
   }
-} 
+}
