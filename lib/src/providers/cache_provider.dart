@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -14,13 +15,11 @@ class CacheProvider {
   final DefaultCacheManager _cacheManager = DefaultCacheManager();
 
   /// Get file from cache or download
-  Future<FileInfo> getFile(String url, {Duration? maxAge}) async {
-    return await _cacheManager.getFileFromCache(url) ??
-        await _cacheManager.downloadFile(
-          url,
-          key: url,
-          maxAge: maxAge ?? const Duration(days: 30),
-        );
+  Future<File> getFile(String url, {Duration? maxAge}) async {
+    return await _cacheManager.getSingleFile(
+      url,
+      key: url,
+    );
   }
 
   /// Clear cache for specific URL
@@ -36,8 +35,16 @@ class CacheProvider {
   /// Get cache size in bytes
   Future<int> getCacheSize() async {
     final appDir = await getTemporaryDirectory();
-    final cacheDir = await _cacheManager.getFilePath();
-    // Implementation to calculate cache size
-    return 0; // Placeholder
+    final cacheDir = '${appDir.path}/libCachedImageData';
+    final dir = Directory(cacheDir);
+    if (!await dir.exists()) return 0;
+    
+    int size = 0;
+    await for (final file in dir.list(recursive: true)) {
+      if (file is File) {
+        size += await file.length();
+      }
+    }
+    return size;
   }
 } 
