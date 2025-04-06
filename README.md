@@ -13,7 +13,7 @@ and the Flutter guide for
 
 <div align="center">
   <kbd>
-    <img src="https://github.com/jamalihassan0307/imageflow/blob/main/image/image.jpg?raw=true" width="250" alt="ImageFlow"/>
+    <img src="https://github.com/jamalihassan0307/Projects-Assets/blob/main/globel%20assets/profile/image.jpg?raw=true" width="250" alt="ImageFlow"/>
   </kbd>
   
   <h1>🌟 ImageFlow 🌟</h1>
@@ -69,36 +69,43 @@ An advanced image loader for Flutter with caching, placeholders, and progressive
 🏎️ **Optimized Lazy Loading**
 - Loads images only when they become visible in the viewport
 - Reduces memory usage and initial load time
+- Configurable visibility threshold for loading
 
 🛠️ **Advanced Caching Support**
 - Efficient local storage caching
-- Customizable cache duration
-- Automatic cache management
+- Permanent and temporary cache options
+- Automatic cache size management
+- Offline-first approach with cache fallback
 
 🔄 **Placeholder & Error Handling**
 - Customizable loading placeholders
-- Elegant error states
+- Elegant error states with retry options
 - Smooth transitions between states
+- Clear feedback for offline mode
 
 📱 **Adaptive Image Quality**
-- Progressive image loading
-- Low-res to high-res transitions
-- Bandwidth-aware loading
+- Progressive image loading with quality transitions
+- Low-res to high-res automatic switching
+- Bandwidth-aware loading strategies
+- Configurable quality thresholds
 
 🚀 **Prefetching & Preloading**
 - Smart preloading of off-screen images
-- Configurable prefetch policies
-- Background loading support
+- Batch prefetching capabilities
+- Background loading with progress tracking
+- Optimized memory usage
 
 🌍 **Network & Offline Support**
-- Offline-first approach
+- Robust offline mode with permanent cache
 - Automatic network state detection
-- Fallback mechanisms for offline usage
+- Clear UI feedback for connectivity status
+- Seamless offline-online transitions
 
 🎨 **Extended Format Support**
-- GIF support
-- SVG rendering
-- Extensible format handlers
+- GIF and animated image support
+- SVG rendering capabilities
+- Interactive image viewing with zoom
+- Responsive layout handling
 
 ### Android Setup
 
@@ -110,17 +117,14 @@ Add the following permission to your Android Manifest (`android/app/src/main/And
 
 This permission is required for loading images from the internet.
 
-
 ## 🚀 Getting Started
 
 Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  imageflow: ^1.0.7
+  imageflow: ^1.0.8
 ```
-
-
 
 ## 💻 Usage Examples
 
@@ -128,39 +132,17 @@ dependencies:
 ```dart
 LazyCacheImage(
   imageUrl: 'https://example.com/image.jpg',
-)
-```
-
-### With Custom Placeholder
-```dart
-LazyCacheImage(
-  imageUrl: 'https://example.com/image.jpg',
-  placeholder: const Center(
-    child: CircularProgressIndicator(),
-  ),
-)
-```
-
-### With Error Handling
-```dart
-LazyCacheImage(
-  imageUrl: 'https://example.com/image.jpg',
-  errorWidget: const Icon(
-    Icons.error_outline,
-    color: Colors.red,
-  ),
-)
-```
-
-### Advanced Usage
-```dart
-LazyCacheImage(
-  imageUrl: 'https://example.com/image.jpg',
   fit: BoxFit.cover,
-  maxWidth: 300,
-  maxHeight: 300,
-  visibilityFraction: 0.1,
-  cacheDuration: const Duration(days: 7),
+)
+```
+
+### With Advanced Caching
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/image.jpg',
+  enableOfflineMode: true,
+  storeInCache: true, // For permanent storage
+  cacheDuration: const Duration(days: 30),
 )
 ```
 
@@ -170,35 +152,14 @@ LazyCacheImage(
   imageUrl: 'https://example.com/high-quality.jpg',
   lowResUrl: 'https://example.com/low-quality.jpg',
   enableAdaptiveLoading: true,
-  fit: BoxFit.cover,
+  visibilityFraction: 0.1,
+  placeholder: const Center(
+    child: CircularProgressIndicator(),
+  ),
 )
 ```
 
-### Offline Mode Support
-```dart
-LazyCacheImage(
-  imageUrl: 'https://example.com/image.jpg',
-  enableOfflineMode: true,
-  placeholder: const Text('Loading from cache...'),
-)
-```
-
-### With Prefetching
-```dart
-// Prefetch multiple images
-await ImageUtils.prefetchImages([
-  'https://example.com/image1.jpg',
-  'https://example.com/image2.jpg',
-]);
-
-// Use in widget
-LazyCacheImage(
-  imageUrl: 'https://example.com/image1.jpg',
-  enableOfflineMode: true,
-)
-```
-
-### Interactive Image Viewer
+### Interactive Viewer with Error Handling
 ```dart
 InteractiveViewer(
   minScale: 0.5,
@@ -206,54 +167,150 @@ InteractiveViewer(
   child: LazyCacheImage(
     imageUrl: 'https://example.com/image.jpg',
     fit: BoxFit.contain,
+    errorWidget: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, color: Colors.red),
+          Text('Failed to load image'),
+          ElevatedButton(
+            onPressed: () => {/* Retry logic */},
+            child: Text('Retry'),
+          ),
+        ],
+      ),
+    ),
+  ),
+)
+```
+
+### Grid View with Lazy Loading
+```dart
+GridView.builder(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    childAspectRatio: 0.75,
+  ),
+  itemBuilder: (context, index) => LazyCacheImage(
+    imageUrl: images[index],
+    visibilityFraction: 0.1,
+    enableAdaptiveLoading: true,
+    enableOfflineMode: true,
+    fit: BoxFit.cover,
+  ),
+)
+```
+
+### Batch Image Prefetching
+```dart
+// Prefetch and store images permanently
+await ImageUtils.prefetchImages(
+  [
+    'https://example.com/image1.jpg',
+    'https://example.com/image2.jpg',
+  ],
+  storeInCache: true,
+);
+
+// Use in widgets
+LazyCacheImage(
+  imageUrl: 'https://example.com/image1.jpg',
+  enableOfflineMode: true,
+  placeholder: const Text('Loading from cache...'),
+)
+```
+
+### Advanced Cache Management
+```dart
+final cacheProvider = CacheProvider();
+
+// Get cache information
+final size = await cacheProvider.getCacheSize();
+final path = await cacheProvider.getCachePath();
+
+// Check cache status
+final isCached = await ImageUtils.isImageCached(
+  url,
+  checkPermanent: true,
+);
+
+// Clear specific image
+await cacheProvider.clearCache(url);
+
+// Clear all cache
+await cacheProvider.clearAllCache();
+```
+
+### Offline-First Implementation
+```dart
+LazyCacheImage(
+  imageUrl: url,
+  enableOfflineMode: true,
+  storeInCache: true,
+  placeholder: Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(),
+        Text('Loading from cache...'),
+      ],
+    ),
+  ),
+  errorWidget: Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.cloud_off),
+        Text('Image not available offline'),
+      ],
+    ),
   ),
 )
 ```
 
 ## 🎯 Use Cases
 
-### 1. Image Lists & Grids
-Perfect for optimizing performance in scrolling lists:
+### 1. Social Media Feed
+Perfect for image-heavy social feeds:
 ```dart
 ListView.builder(
-  itemBuilder: (context, index) => LazyCacheImage(
-    imageUrl: images[index],
-    visibilityFraction: 0.1,
+  itemBuilder: (context, index) => Card(
+    child: LazyCacheImage(
+      imageUrl: posts[index].imageUrl,
+      enableAdaptiveLoading: true,
+      visibilityFraction: 0.1,
+      storeInCache: true,
+    ),
   ),
 )
 ```
 
-### 2. SVG Support
-Automatically handles SVG images:
+### 2. Photo Gallery
+Ideal for photo galleries with zoom:
 ```dart
-LazyCacheImage(
-  imageUrl: 'https://example.com/vector.svg',
-  fit: BoxFit.contain,
+InteractiveViewer(
+  minScale: 0.5,
+  maxScale: 4.0,
+  child: LazyCacheImage(
+    imageUrl: photo.url,
+    fit: BoxFit.contain,
+    enableOfflineMode: true,
+    storeInCache: true,
+  ),
 )
 ```
 
-### 3. Offline Support
-Images remain available offline after first load:
+### 3. E-commerce Product Images
+Great for product listings:
 ```dart
-LazyCacheImage(
-  imageUrl: url,
-  placeholder: const Text('Loading from cache...'),
+GridView.builder(
+  itemBuilder: (context, index) => LazyCacheImage(
+    imageUrl: products[index].imageUrl,
+    lowResUrl: products[index].thumbnailUrl,
+    enableAdaptiveLoading: true,
+    storeInCache: true,
+  ),
 )
-```
-
-### 4. Cache Management
-Easy cache control:
-```dart
-final cacheProvider = CacheProvider();
-
-// Clear specific image
-await cacheProvider.clearCache(imageUrl);
-
-// Clear all cached images
-await cacheProvider.clearAllCache();
-
-// Get cache size
-final size = await cacheProvider.getCacheSize();
 ```
 
 ## 🤝 Contributing
