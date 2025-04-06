@@ -215,7 +215,16 @@ class _MainPageState extends State<MainPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.45,
                     child: ListTile(
-                      title: const Text('Adaptive Loading'),
+                      title: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'Adaptive Loading',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                       subtitle: const Text('Low to High Quality'),
                       trailing: Switch(
                         value: _enableAdaptiveLoading,
@@ -227,9 +236,13 @@ class _MainPageState extends State<MainPage> {
                     width: MediaQuery.of(context).size.width * 0.45,
                     child: ListTile(
                       title: Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Offline Mode'),
+                          Flexible(
+                            child: Text(
+                              'Offline Mode',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           if (_isOffline)
                             Padding(
                               padding: const EdgeInsets.only(left: 8),
@@ -433,7 +446,7 @@ class _MainPageState extends State<MainPage> {
   Widget _buildBottomBar() {
     return BottomAppBar(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -443,7 +456,7 @@ class _MainPageState extends State<MainPage> {
                 Expanded(
                   child: Text(
                     'Cache Size: $_cacheSize',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodySmall,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -452,27 +465,27 @@ class _MainPageState extends State<MainPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 16,
-                        height: 16,
+                        width: 12,
+                        height: 12,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Text(
+                      const SizedBox(width: 4),
+                      Text(
                         'Saving...',
-                        style: TextStyle(fontSize: 12),
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   _buildBottomButton(
                     icon: Icons.refresh,
@@ -511,19 +524,18 @@ class _MainPageState extends State<MainPage> {
     required String label,
     required VoidCallback? onPressed,
   }) {
-    return SizedBox(
-      height: 36,
-      child: TextButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 18),
-        label: Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        ),
-        style: TextButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.primary,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-        ),
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 16),
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 12),
+      ),
+      style: TextButton.styleFrom(
+        foregroundColor: Theme.of(context).colorScheme.primary,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        minimumSize: const Size(0, 32),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }
@@ -621,28 +633,28 @@ class DemoImage {
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://picsum.photos/800/1200?random=1',
-    title: 'Nature Scene',
-    description: 'Beautiful landscape from Picsum Photos',
+    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/flutter/basic.jpeg?raw=true',
+    title: 'Flutter Basic',
+    description: 'Flutter Basic',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/800/1200?random=2',
-    title: 'Urban Life',
-    description: 'City scenes and architecture',
+    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/asp.net%20core/Intermediate.jpeg?raw=true',
+    title: 'Asp.net Core Intermediate',
+    description: 'Asp.net Core Intermediate',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/800/1200?random=3',
-    title: 'Abstract Art',
-    description: 'Creative and inspiring imagery',
+    url: 'https://github.com/jamalihassan0307/imageflow/blob/main/image/image.jpg?raw=true',
+    title: 'Ali hassan',
+    description: 'Ali hassan',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/800/1200?random=4',
-    title: 'Wildlife',
-    description: 'Animals in their natural habitat',
+    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/asp.net%20core/master.jpeg?raw=true',
+    title: 'Asp.net Core Master',
+    description: 'Asp.net Core Master',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/800/1200?random=5',
-    title: 'Technology',
-    description: 'Modern tech and innovation',
+    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/flutter/advanced.jpeg?raw=true',
+    title: 'Flutter Advanced',
+    description: 'Flutter Advanced',
   ),
 ];
