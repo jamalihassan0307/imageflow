@@ -96,7 +96,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: LazyCacheImage(
                           imageUrl: image.url,
                           fit: BoxFit.cover,
-                          placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
+                          placeholder: _showPlaceholder
+                              ? _buildCustomPlaceholder()
+                              : null,
                           errorWidget: _buildCustomErrorWidget(),
                           maxWidth: 300,
                           maxHeight: 300,
@@ -224,4 +226,4 @@ final _demoImages = [
     title: 'Lazy Loading',
     description: 'This image demonstrates lazy loading',
   ),
-]; 
+];
