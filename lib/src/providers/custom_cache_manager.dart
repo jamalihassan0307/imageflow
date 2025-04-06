@@ -28,7 +28,7 @@ class CustomCacheManager extends CacheManager {
         ));
 
   Future<String> getCachePath({bool permanent = false}) async {
-    final directory = permanent 
+    final directory = permanent
         ? await getApplicationDocumentsDirectory()
         : await getTemporaryDirectory();
     return p.join(directory.path, permanent ? permanentKey : key);

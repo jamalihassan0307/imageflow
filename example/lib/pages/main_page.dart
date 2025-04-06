@@ -62,14 +62,16 @@ class _MainPageState extends State<MainPage> {
     try {
       for (final image in _demoImages) {
         final isCached = await ImageUtils.isImageCached(image.url);
-        final isPermanent = await ImageUtils.isImageCached(image.url, checkPermanent: true);
+        final isPermanent =
+            await ImageUtils.isImageCached(image.url, checkPermanent: true);
         if (mounted) {
           setState(() {
             _cachedImages[image.url] = isCached;
             _permanentlyCachedImages[image.url] = isPermanent;
           });
         }
-        developer.log('Cache status for ${image.url}: $isCached (permanent: $isPermanent)');
+        developer.log(
+            'Cache status for ${image.url}: $isCached (permanent: $isPermanent)');
       }
     } catch (e) {
       developer.log('Error updating cache status: $e');
@@ -83,14 +85,16 @@ class _MainPageState extends State<MainPage> {
         try {
           await ImageUtils.prefetchImages([img.url]);
           final isCached = await ImageUtils.isImageCached(img.url);
-          final isPermanent = await ImageUtils.isImageCached(img.url, checkPermanent: true);
+          final isPermanent =
+              await ImageUtils.isImageCached(img.url, checkPermanent: true);
           if (mounted) {
             setState(() {
               _cachedImages[img.url] = isCached;
               _permanentlyCachedImages[img.url] = isPermanent;
             });
           }
-          developer.log('Prefetched and cached: ${img.url} - Success: $isCached (permanent: $isPermanent)');
+          developer.log(
+              'Prefetched and cached: ${img.url} - Success: $isCached (permanent: $isPermanent)');
         } catch (e) {
           developer.log('Error prefetching image ${img.url}: $e');
         }
@@ -158,7 +162,9 @@ class _MainPageState extends State<MainPage> {
   Widget _buildNetworkStatus() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: _isOffline ? Colors.orange.withOpacity(0.2) : Colors.green.withOpacity(0.2),
+      color: _isOffline
+          ? Colors.orange.withOpacity(0.2)
+          : Colors.green.withOpacity(0.2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -203,7 +209,8 @@ class _MainPageState extends State<MainPage> {
                     max: 1.0,
                     divisions: 10,
                     label: '${(_visibilityFraction * 100).round()}%',
-                    onChanged: (value) => setState(() => _visibilityFraction = value),
+                    onChanged: (value) =>
+                        setState(() => _visibilityFraction = value),
                   ),
                 ),
               ],
@@ -228,7 +235,8 @@ class _MainPageState extends State<MainPage> {
                       subtitle: const Text('Low to High Quality'),
                       trailing: Switch(
                         value: _enableAdaptiveLoading,
-                        onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
+                        onChanged: (value) =>
+                            setState(() => _enableAdaptiveLoading = value),
                       ),
                     ),
                   ),
@@ -254,7 +262,8 @@ class _MainPageState extends State<MainPage> {
                             ),
                         ],
                       ),
-                      subtitle: Text(_isOffline ? 'Using Cached Images' : 'Cache Support'),
+                      subtitle: Text(
+                          _isOffline ? 'Using Cached Images' : 'Cache Support'),
                       trailing: Switch(
                         value: _enableOfflineMode,
                         onChanged: _toggleOfflineMode,
@@ -298,7 +307,7 @@ class _MainPageState extends State<MainPage> {
   Widget _buildImageCard(DemoImage image) {
     final isCached = _cachedImages[image.url] ?? false;
     final isPermanent = _permanentlyCachedImages[image.url] ?? false;
-    
+
     return Card(
       child: InkWell(
         onTap: () => Navigator.push(
@@ -321,7 +330,7 @@ class _MainPageState extends State<MainPage> {
             Stack(
               children: [
                 AspectRatio(
-                  aspectRatio: 4/3,
+                  aspectRatio: 4 / 3,
                   child: Hero(
                     tag: image.url,
                     child: LazyCacheImage(
@@ -343,16 +352,22 @@ class _MainPageState extends State<MainPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              _isOffline ? Icons.cloud_off : Icons.error_outline,
+                              _isOffline
+                                  ? Icons.cloud_off
+                                  : Icons.error_outline,
                               color: _isOffline ? Colors.orange : Colors.red,
                               size: 32,
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              _isOffline ? 'No internet connection\nImage not cached' : 'Error loading image',
+                              _isOffline
+                                  ? 'No internet connection\nImage not cached'
+                                  : 'Error loading image',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: _isOffline ? Colors.orange[700] : Colors.red,
+                                color: _isOffline
+                                    ? Colors.orange[700]
+                                    : Colors.red,
                                 fontSize: 12,
                               ),
                             ),
@@ -367,7 +382,8 @@ class _MainPageState extends State<MainPage> {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(12),
@@ -405,10 +421,11 @@ class _MainPageState extends State<MainPage> {
                       Expanded(
                         child: Text(
                           image.title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -496,7 +513,11 @@ class _MainPageState extends State<MainPage> {
                   _buildBottomButton(
                     icon: Icons.save_alt,
                     label: 'Save All',
-                    onPressed: _isBatchCaching ? null : () { _saveAllImages(); },
+                    onPressed: _isBatchCaching
+                        ? null
+                        : () {
+                            _saveAllImages();
+                          },
                   ),
                   const SizedBox(width: 8),
                   _buildBottomButton(
@@ -601,17 +622,17 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _showCacheInfo() async {
-    final permanentCount = _permanentlyCachedImages.values.where((v) => v).length;
-    final temporaryCount = _cachedImages.values.where((v) => v).length - permanentCount;
-    
+    final permanentCount =
+        _permanentlyCachedImages.values.where((v) => v).length;
+    final temporaryCount =
+        _cachedImages.values.where((v) => v).length - permanentCount;
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Cache size: $_cacheSize\n'
-            'Permanent images: $permanentCount\n'
-            'Temporary images: $temporaryCount'
-          ),
+          content: Text('Cache size: $_cacheSize\n'
+              'Permanent images: $permanentCount\n'
+              'Temporary images: $temporaryCount'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -633,27 +654,32 @@ class DemoImage {
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/flutter/basic.jpeg?raw=true',
+    url:
+        'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/flutter/basic.jpeg?raw=true',
     title: 'Flutter Basic',
     description: 'Flutter Basic',
   ),
   const DemoImage(
-    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/asp.net%20core/Intermediate.jpeg?raw=true',
+    url:
+        'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/asp.net%20core/Intermediate.jpeg?raw=true',
     title: 'Asp.net Core Intermediate',
     description: 'Asp.net Core Intermediate',
   ),
   const DemoImage(
-    url: 'https://github.com/jamalihassan0307/imageflow/blob/main/image/image.jpg?raw=true',
+    url:
+        'https://github.com/jamalihassan0307/imageflow/blob/main/image/image.jpg?raw=true',
     title: 'Ali hassan',
     description: 'Ali hassan',
   ),
   const DemoImage(
-    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/asp.net%20core/master.jpeg?raw=true',
+    url:
+        'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/asp.net%20core/master.jpeg?raw=true',
     title: 'Asp.net Core Master',
     description: 'Asp.net Core Master',
   ),
   const DemoImage(
-    url: 'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/flutter/advanced.jpeg?raw=true',
+    url:
+        'https://github.com/jamalihassan0307/jamalihassan0307/blob/main/images/flutter/advanced.jpeg?raw=true',
     title: 'Flutter Advanced',
     description: 'Flutter Advanced',
   ),

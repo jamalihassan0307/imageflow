@@ -37,7 +37,8 @@ class _ImagePageState extends State<ImagePage> {
 
   Future<void> _checkImageCache() async {
     final isCached = await ImageUtils.isImageCached(widget.image.url);
-    final isPermanent = await ImageUtils.isImageCached(widget.image.url, checkPermanent: true);
+    final isPermanent =
+        await ImageUtils.isImageCached(widget.image.url, checkPermanent: true);
     if (mounted) {
       setState(() {
         _isCached = isCached;
@@ -78,7 +79,7 @@ class _ImagePageState extends State<ImagePage> {
         await _cacheProvider.getFile(widget.image.url);
         await _checkImageCache();
       }
-      
+
       if (mounted) {
         setState(() {
           _isHighQuality = !_isHighQuality;
@@ -348,7 +349,8 @@ class _ImagePageState extends State<ImagePage> {
               ),
               if (_isCached)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -402,7 +404,8 @@ class _ImagePageState extends State<ImagePage> {
                     }
                   },
                   icon: const Icon(Icons.delete_outline, size: 18),
-                  label: const Text('Clear Cache', style: TextStyle(fontSize: 12)),
+                  label:
+                      const Text('Clear Cache', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
@@ -412,8 +415,10 @@ class _ImagePageState extends State<ImagePage> {
                   TextButton.icon(
                     onPressed: () async {
                       try {
-                        final file = await _cacheProvider.getFile(widget.image.url);
-                        await CustomCacheManager().storeFileInPermanentCache(widget.image.url, file);
+                        final file =
+                            await _cacheProvider.getFile(widget.image.url);
+                        await CustomCacheManager()
+                            .storeFileInPermanentCache(widget.image.url, file);
                         await _checkImageCache();
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -435,12 +440,14 @@ class _ImagePageState extends State<ImagePage> {
                       }
                     },
                     icon: const Icon(Icons.save_alt, size: 18),
-                    label: const Text('Save Offline', style: TextStyle(fontSize: 12)),
+                    label: const Text('Save Offline',
+                        style: TextStyle(fontSize: 12)),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                     ),
                   ),
-                if (widget.enableAdaptiveLoading && (!widget.isOffline || _isCached)) ...[
+                if (widget.enableAdaptiveLoading &&
+                    (!widget.isOffline || _isCached)) ...[
                   const SizedBox(width: 8),
                   TextButton.icon(
                     onPressed: _toggleImageQuality,

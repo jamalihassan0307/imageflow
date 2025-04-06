@@ -56,7 +56,8 @@ class ImageUtils {
   }
 
   /// Prefetch and optionally store images permanently
-  static Future<void> prefetchImages(List<String> urls, {bool storeInCache = false}) async {
+  static Future<void> prefetchImages(List<String> urls,
+      {bool storeInCache = false}) async {
     for (final url in urls) {
       try {
         final file = await _cacheManager.getSingleFile(url);
@@ -71,12 +72,13 @@ class ImageUtils {
   }
 
   /// Check if image is available in cache
-  static Future<bool> isImageCached(String url, {bool checkPermanent = true}) async {
+  static Future<bool> isImageCached(String url,
+      {bool checkPermanent = true}) async {
     if (checkPermanent) {
       final permanentFile = await _cacheManager.getFileFromPermanentCache(url);
       if (permanentFile != null) return true;
     }
-    
+
     final fileInfo = await _cacheManager.getFileFromCache(
       _cacheManager.getCacheKey(url),
     );
@@ -84,10 +86,12 @@ class ImageUtils {
   }
 
   /// Get cached file if available
-  static Future<File?> getCachedFile(String url, {bool checkPermanent = true}) async {
+  static Future<File?> getCachedFile(String url,
+      {bool checkPermanent = true}) async {
     try {
       if (checkPermanent) {
-        final permanentFile = await _cacheManager.getFileFromPermanentCache(url);
+        final permanentFile =
+            await _cacheManager.getFileFromPermanentCache(url);
         if (permanentFile != null) return permanentFile;
       }
 
