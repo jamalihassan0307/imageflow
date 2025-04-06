@@ -59,7 +59,8 @@ class LazyCacheImage extends StatefulWidget {
   State<LazyCacheImage> createState() => _LazyCacheImageState();
 }
 
-class _LazyCacheImageState extends State<LazyCacheImage> with AutomaticKeepAliveClientMixin {
+class _LazyCacheImageState extends State<LazyCacheImage>
+    with AutomaticKeepAliveClientMixin {
   bool _isVisible = false;
   bool _hasLoaded = false;
   bool _hasError = false;
@@ -96,7 +97,7 @@ class _LazyCacheImageState extends State<LazyCacheImage> with AutomaticKeepAlive
 
   Future<void> _retryLoading() async {
     if (!mounted) return;
-    
+
     setState(() {
       _hasError = false;
       _hasLoaded = false;
@@ -104,7 +105,7 @@ class _LazyCacheImageState extends State<LazyCacheImage> with AutomaticKeepAlive
     });
 
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     if (mounted) {
       setState(() {
         _isVisible = true;
@@ -128,7 +129,8 @@ class _LazyCacheImageState extends State<LazyCacheImage> with AutomaticKeepAlive
       maxHeightDiskCache: widget.maxHeight?.toInt(),
       key: ValueKey('${widget.imageUrl}-${_hasError ? 'retry' : 'initial'}'),
       progressIndicatorBuilder: widget.placeholder == null
-          ? (context, url, progress) => _buildProgressIndicator(context, progress)
+          ? (context, url, progress) =>
+              _buildProgressIndicator(context, progress)
           : null,
       placeholder: widget.placeholder != null
           ? (context, url) => widget.placeholder!
