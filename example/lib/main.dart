@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ImageFlow Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -21,51 +21,119 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool _showPlaceholder = true;
+  double _visibilityFraction = 0.1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ImageFlow Demo'),
+        actions: [
+          IconButton(
+            icon: Icon(_showPlaceholder ? Icons.refresh : Icons.downloading),
+            onPressed: () {
+              setState(() {
+                _showPlaceholder = !_showPlaceholder;
+              });
+            },
+            tooltip: 'Toggle placeholder/progress',
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: _demoImages.length,
-        itemBuilder: (context, index) {
-          final image = _demoImages[index];
-          return Card(
-            margin: const EdgeInsets.all(8.0),
-            child: Column(
+      body: Column(
+        children: [
+          // Visibility threshold slider
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
               children: [
-                SizedBox(
-                  height: 200,
-                  child: LazyCacheImage(
-                    imageUrl: image.url,
-                    placeholder: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 50,
-                    ),
-                    maxWidth: 400,
-                    maxHeight: 400,
+                const Text('Visibility threshold: '),
+                Expanded(
+                  child: Slider(
+                    value: _visibilityFraction,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 10,
+                    label: '${(_visibilityFraction * 100).round()}%',
+                    onChanged: (value) {
+                      setState(() {
+                        _visibilityFraction = value;
+                      });
+                    },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(image.description),
                 ),
               ],
             ),
-          );
-        },
+          ),
+          // Image grid
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: _demoImages.length,
+              itemBuilder: (context, index) {
+                final image = _demoImages[index];
+                return Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: LazyCacheImage(
+                          imageUrl: image.url,
+                          fit: BoxFit.cover,
+                          placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
+                          errorWidget: _buildCustomErrorWidget(),
+                          maxWidth: 300,
+                          maxHeight: 300,
+                          visibilityFraction: _visibilityFraction,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              image.title,
+                              style: Theme.of(context).textTheme.titleMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              image.description,
+                              style: Theme.of(context).textTheme.bodySmall,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          // Clear cache example
           final cacheProvider = CacheProvider();
           await cacheProvider.clearAllCache();
           if (context.mounted) {
@@ -74,7 +142,40 @@ class MyHomePage extends StatelessWidget {
             );
           }
         },
-        child: const Icon(Icons.delete),
+        icon: const Icon(Icons.delete_outline),
+        label: const Text('Clear Cache'),
+      ),
+    );
+  }
+
+  Widget _buildCustomPlaceholder() {
+    return Container(
+      color: Colors.grey[200],
+      child: const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.image_outlined, size: 48, color: Colors.grey),
+            SizedBox(height: 8),
+            Text('Loading...', style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomErrorWidget() {
+    return Container(
+      color: Colors.grey[200],
+      child: const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: Colors.red),
+            SizedBox(height: 8),
+            Text('Error loading image', style: TextStyle(color: Colors.red)),
+          ],
+        ),
       ),
     );
   }
@@ -82,29 +183,45 @@ class MyHomePage extends StatelessWidget {
 
 class DemoImage {
   final String url;
+  final String title;
   final String description;
 
   const DemoImage({
     required this.url,
+    required this.title,
     required this.description,
   });
 }
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://avatars.githubusercontent.com/u/136632321?v=4',
-    description: 'Random Image 1 - Regular JPEG',
-  ),
-  const DemoImage(
-    url: 'https://avatars.githubusercontent.com/u/136632322?v=4',
-    description: 'Random Image 2 - Regular JPEG',
+    url: 'https://picsum.photos/seed/1/400/600',
+    title: 'Random Image',
+    description: 'High-quality random image from Picsum Photos',
   ),
   const DemoImage(
     url: 'https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/android.svg',
-    description: 'Android Logo - SVG Example',
+    title: 'Android Logo',
+    description: 'SVG vector image example',
   ),
   const DemoImage(
-    url: 'https://github.com/jamalihassan0307/jamalihassan0307/raw/main/thoughtworks-gif_dribbble.gif',
-    description: 'Animated GIF Example',
+    url: 'https://media.giphy.com/media/l0HlMZrXA2H7aqpwI/giphy.gif',
+    title: 'Animated GIF',
+    description: 'Animated GIF example from Giphy',
+  ),
+  const DemoImage(
+    url: 'https://picsum.photos/seed/2/400/600',
+    title: 'Another Random',
+    description: 'Another random image example',
+  ),
+  const DemoImage(
+    url: 'https://invalid.url/image.jpg',
+    title: 'Error Example',
+    description: 'This image will show the error state',
+  ),
+  const DemoImage(
+    url: 'https://picsum.photos/seed/3/400/600',
+    title: 'Lazy Loading',
+    description: 'This image demonstrates lazy loading',
   ),
 ]; 
