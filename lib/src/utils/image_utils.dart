@@ -6,7 +6,9 @@ class ImageUtils {
   /// Check if device is connected to the internet
   static Future<bool> hasInternetConnection() async {
     final connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
+    return connectivityResult == ConnectivityResult.wifi ||
+           connectivityResult == ConnectivityResult.mobile ||
+           connectivityResult == ConnectivityResult.ethernet;
   }
 
   /// Calculate optimal image dimensions based on screen size
