@@ -161,25 +161,30 @@ class _ImagePageState extends State<ImagePage> {
                 ],
               ),
             ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildStatusChip(
-                label: 'Adaptive Loading',
-                value: widget.enableAdaptiveLoading,
-                icon: Icons.auto_awesome,
-              ),
-              _buildStatusChip(
-                label: _isPermanentlyCached ? 'Saved Offline' : 'Cached',
-                value: _isCached,
-                icon: _isPermanentlyCached ? Icons.save : Icons.cached,
-              ),
-              _buildStatusChip(
-                label: 'High Quality',
-                value: _isHighQuality,
-                icon: Icons.high_quality,
-              ),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStatusChip(
+                  label: 'Adaptive',
+                  value: widget.enableAdaptiveLoading,
+                  icon: Icons.auto_awesome,
+                ),
+                const SizedBox(width: 8),
+                _buildStatusChip(
+                  label: _isPermanentlyCached ? 'Saved' : 'Cached',
+                  value: _isCached,
+                  icon: _isPermanentlyCached ? Icons.save : Icons.cached,
+                ),
+                const SizedBox(width: 8),
+                _buildStatusChip(
+                  label: 'HD',
+                  value: _isHighQuality,
+                  icon: Icons.high_quality,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -338,6 +343,7 @@ class _ImagePageState extends State<ImagePage> {
                 child: Text(
                   widget.image.title,
                   style: Theme.of(context).textTheme.titleLarge,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (_isCached)
@@ -357,7 +363,7 @@ class _ImagePageState extends State<ImagePage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        _isPermanentlyCached ? 'Saved Offline' : 'Cached',
+                        _isPermanentlyCached ? 'Saved' : 'Cached',
                         style: TextStyle(
                           color: Colors.green,
                           fontSize: 12,
@@ -373,63 +379,83 @@ class _ImagePageState extends State<ImagePage> {
           Text(
             widget.image.description,
             style: Theme.of(context).textTheme.bodyMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton.icon(
-                onPressed: () async {
-                  await _cacheProvider.clearCache(widget.image.url);
-                  await _checkImageCache();
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Image cache cleared'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.delete_outline),
-                label: const Text('Clear Cache'),
-              ),
-              if (!_isPermanentlyCached)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 TextButton.icon(
                   onPressed: () async {
-                    try {
-                      final file = await _cacheProvider.getFile(widget.image.url);
-                      await CustomCacheManager().storeFileInPermanentCache(widget.image.url, file);
-                      await _checkImageCache();
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Image saved for offline use'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error saving image: $e'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
+                    await _cacheProvider.clearCache(widget.image.url);
+                    await _checkImageCache();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Image cache cleared'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
                     }
                   },
-                  icon: const Icon(Icons.save_alt),
-                  label: const Text('Save Offline'),
+                  icon: const Icon(Icons.delete_outline, size: 18),
+                  label: const Text('Clear Cache', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
                 ),
-              if (widget.enableAdaptiveLoading && (!widget.isOffline || _isCached))
-                TextButton.icon(
-                  onPressed: _toggleImageQuality,
-                  icon: Icon(_isHighQuality ? Icons.hd : Icons.sd),
-                  label: Text(_isHighQuality ? 'Switch to Low' : 'Switch to High'),
-                ),
-            ],
+                const SizedBox(width: 8),
+                if (!_isPermanentlyCached)
+                  TextButton.icon(
+                    onPressed: () async {
+                      try {
+                        final file = await _cacheProvider.getFile(widget.image.url);
+                        await CustomCacheManager().storeFileInPermanentCache(widget.image.url, file);
+                        await _checkImageCache();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Image saved for offline use'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error saving image: $e'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.save_alt, size: 18),
+                    label: const Text('Save Offline', style: TextStyle(fontSize: 12)),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+                if (widget.enableAdaptiveLoading && (!widget.isOffline || _isCached)) ...[
+                  const SizedBox(width: 8),
+                  TextButton.icon(
+                    onPressed: _toggleImageQuality,
+                    icon: Icon(_isHighQuality ? Icons.hd : Icons.sd, size: 18),
+                    label: Text(
+                      _isHighQuality ? 'Switch to Low' : 'Switch to High',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ],
       ),
