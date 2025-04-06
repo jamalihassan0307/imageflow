@@ -166,9 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
               tag: image.url,
               child: LazyCacheImage(
                 imageUrl: image.url,
-                fit: BoxFit.cover,
-                placeholder:
-                    _showPlaceholder ? _buildCustomPlaceholder() : null,
+                fit: BoxFit.contain,
+                placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
                 errorWidget: _buildCustomErrorWidget(),
                 maxWidth: 600,
                 maxHeight: 800,
@@ -234,6 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+          
             const Icon(
               Icons.error_outline,
               size: 48,
@@ -249,14 +249,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 4),
             Text(
-              'An error occurred while loading the image',
+              'Please check your internet connection',
               style: TextStyle(
                 color: Colors.red[400],
                 fontSize: 12,
               ),
               textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -279,34 +277,33 @@ class DemoImage {
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://picsum.photos/seed/1/800/1200',
-    title: 'Nature Image',
-    description: 'High-quality random nature image from Picsum Photos',
-  ),
-  const DemoImage(
-    url:
-        'https://raw.githubusercontent.com/flutter/website/main/src/assets/images/flutter-logo-sharing.png',
+    url: 'https://raw.githubusercontent.com/flutter/website/main/src/assets/images/flutter-logo-sharing.png',
     title: 'Flutter Logo',
     description: 'Official Flutter logo from GitHub',
   ),
   const DemoImage(
-    url: 'https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif',
-    title: 'Loading Animation',
-    description: 'Smooth loading animation from Giphy',
+    url: 'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
+    title: 'Dash Animation',
+    description: 'Flutter mascot Dash in an animated GIF',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/seed/2/800/1200',
-    title: 'Urban Scene',
-    description: 'Urban photography showcasing city life',
+    url: 'https://storage.googleapis.com/cms-storage-bucket/70760bf1e88b184bb1bc.png',
+    title: 'Flutter Framework',
+    description: 'Flutter framework illustration',
   ),
   const DemoImage(
-    url: 'https://this-url-does-not-exist.jpg',
-    title: 'Error Example',
-    description: 'This image will demonstrate the error state handling',
+    url: 'https://docs.flutter.dev/assets/images/docs/ui/layout/layout-4.png',
+    title: 'Flutter Layout',
+    description: 'Flutter layout example image',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/seed/3/800/1200',
-    title: 'Abstract Art',
-    description: 'Abstract artistic photography with vibrant colors',
+    url: 'https://docs.flutter.dev/assets/images/docs/ui/material/cards.png',
+    title: 'Material Cards',
+    description: 'Example of Material Design cards in Flutter',
+  ),
+  const DemoImage(
+    url: 'https://docs.flutter.dev/assets/images/docs/ui/layout/row-diagram.png',
+    title: 'Row Layout',
+    description: 'Diagram showing Flutter row layout',
   ),
 ];
