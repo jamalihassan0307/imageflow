@@ -350,19 +350,19 @@ class DemoImage {
 }
 
 final _demoImages = [
-  const DemoImage(
-    url: 'https://i.imgur.com/RGLtxuU.jpeg',
-    title: 'Nature Image 1',
-    description: 'Beautiful landscape from Imgur',
+ const DemoImage(
+    url: 'https://picsum.photos/400/600?random=1',
+    title: 'Random Image 1',
+    description: 'Random image from Picsum Photos',
   ),
   const DemoImage(
-    url: 'https://i.imgur.com/L7YoqTN.jpeg',
-    title: 'Nature Image 2',
-    description: 'Mountain scenery from Imgur',
+    url: 'https://picsum.photos/400/600?random=2',
+    title: 'Random Image 2',
+    description: 'Random image from Picsum Photos',
   ),
   const DemoImage(
-    url: 'https://i.imgur.com/FWGhbGz.jpeg',
-    title: 'Nature Image 3',
-    description: 'Forest view from Imgur',
+    url: 'https://picsum.photos/400/600?random=3',
+    title: 'Random Image 3',
+    description: 'Random image from Picsum Photos',
   ),
 ];
