@@ -1,6 +1,6 @@
 name: imageflow
 description: "An advanced image loader for Flutter with caching, placeholders, and progressive loading."
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/jamalihassan0307/imageflow
 
 environment:
