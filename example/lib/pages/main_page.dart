@@ -40,21 +40,41 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _updateCacheStatus() async {
-    for (final image in _demoImages) {
-      final isCached = await ImageUtils.isImageCached(image.url);
-      if (mounted) {
-        setState(() {
-          _cachedImages[image.url] = isCached;
-        });
+    try {
+      for (final image in _demoImages) {
+        final isCached = await ImageUtils.isImageCached(image.url);
+        if (mounted) {
+          setState(() {
+            _cachedImages[image.url] = isCached;
+          });
+        }
+        developer.log('Cache status for ${image.url}: $isCached');
       }
+    } catch (e) {
+      developer.log('Error updating cache status: $e');
     }
   }
 
   Future<void> _prefetchImages() async {
     developer.log('Prefetching images...');
-    await ImageUtils.prefetchImages(
-      _demoImages.map((img) => img.url).toList(),
-    );
+    try {
+      await Future.wait(_demoImages.map((img) async {
+        try {
+          await ImageUtils.prefetchImages([img.url]);
+          final isCached = await ImageUtils.isImageCached(img.url);
+          if (mounted) {
+            setState(() {
+              _cachedImages[img.url] = isCached;
+            });
+          }
+          developer.log('Prefetched and cached: ${img.url} - Success: $isCached');
+        } catch (e) {
+          developer.log('Error prefetching image ${img.url}: $e');
+        }
+      }));
+    } catch (e) {
+      developer.log('Error during prefetch: $e');
+    }
     await _updateCacheStatus();
     developer.log('Prefetching complete');
   }
@@ -164,38 +184,44 @@ class _MainPageState extends State<MainPage> {
                 ),
               ],
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: SwitchListTile(
-                    title: const Text('Adaptive Loading'),
-                    subtitle: const Text('Low to High Quality'),
-                    value: _enableAdaptiveLoading,
-                    onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
-                  ),
-                ),
-                Expanded(
-                  child: SwitchListTile(
-                    title: Row(
-                      children: [
-                        const Text('Offline Mode'),
-                        if (_isOffline)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Icon(
-                              Icons.cloud_off,
-                              size: 16,
-                              color: Colors.orange[700],
-                            ),
-                          ),
-                      ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: SwitchListTile(
+                      title: const Text('Adaptive Loading'),
+                      subtitle: const Text('Low to High Quality'),
+                      value: _enableAdaptiveLoading,
+                      onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
                     ),
-                    subtitle: Text(_isOffline ? 'Using Cached Images' : 'Cache Support'),
-                    value: _enableOfflineMode,
-                    onChanged: _toggleOfflineMode,
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: SwitchListTile(
+                      title: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Offline Mode'),
+                          if (_isOffline)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Icon(
+                                Icons.cloud_off,
+                                size: 16,
+                                color: Colors.orange[700],
+                              ),
+                            ),
+                        ],
+                      ),
+                      subtitle: Text(_isOffline ? 'Using Cached Images' : 'Cache Support'),
+                      value: _enableOfflineMode,
+                      onChanged: _toggleOfflineMode,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -249,7 +275,8 @@ class _MainPageState extends State<MainPage> {
           children: [
             Stack(
               children: [
-                Expanded(
+                AspectRatio(
+                  aspectRatio: 4/3,
                   child: Hero(
                     tag: image.url,
                     child: LazyCacheImage(
@@ -261,6 +288,32 @@ class _MainPageState extends State<MainPage> {
                       enableAdaptiveLoading: _enableAdaptiveLoading,
                       enableOfflineMode: _enableOfflineMode,
                       visibilityFraction: _visibilityFraction,
+                      placeholder: Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      errorWidget: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _isOffline ? Icons.cloud_off : Icons.error_outline,
+                              color: _isOffline ? Colors.orange : Colors.red,
+                              size: 32,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _isOffline ? 'No internet connection\nImage not cached' : 'Error loading image',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: _isOffline ? Colors.orange[700] : Colors.red,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -356,17 +409,7 @@ class _MainPageState extends State<MainPage> {
             _buildBottomButton(
               icon: Icons.delete_outline,
               label: 'Clear Cache',
-              onPressed: () async {
-                await _cacheProvider.clearAllCache();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Cache cleared successfully!'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              },
+              onPressed: _clearCache,
             ),
             _buildBottomButton(
               icon: Icons.info_outline,
@@ -403,6 +446,30 @@ class _MainPageState extends State<MainPage> {
         foregroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
+  }
+
+  Future<void> _clearCache() async {
+    try {
+      await _cacheProvider.clearAllCache();
+      await _updateCacheStatus();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cache cleared successfully!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error clearing cache: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }
 
