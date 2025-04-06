@@ -55,11 +55,14 @@ class ImageUtils {
     return url.toLowerCase().endsWith('.gif');
   }
 
-  /// Prefetch a list of images
-  static Future<void> prefetchImages(List<String> urls) async {
+  /// Prefetch and optionally store images permanently
+  static Future<void> prefetchImages(List<String> urls, {bool storeInCache = false}) async {
     for (final url in urls) {
       try {
-        await _cacheManager.getSingleFile(url);
+        final file = await _cacheManager.getSingleFile(url);
+        if (storeInCache) {
+          await _cacheManager.storeFileInPermanentCache(url, file);
+        }
       } catch (e) {
         // Silently continue if prefetch fails
         continue;
@@ -68,7 +71,12 @@ class ImageUtils {
   }
 
   /// Check if image is available in cache
-  static Future<bool> isImageCached(String url) async {
+  static Future<bool> isImageCached(String url, {bool checkPermanent = true}) async {
+    if (checkPermanent) {
+      final permanentFile = await _cacheManager.getFileFromPermanentCache(url);
+      if (permanentFile != null) return true;
+    }
+    
     final fileInfo = await _cacheManager.getFileFromCache(
       _cacheManager.getCacheKey(url),
     );
@@ -76,8 +84,13 @@ class ImageUtils {
   }
 
   /// Get cached file if available
-  static Future<File?> getCachedFile(String url) async {
+  static Future<File?> getCachedFile(String url, {bool checkPermanent = true}) async {
     try {
+      if (checkPermanent) {
+        final permanentFile = await _cacheManager.getFileFromPermanentCache(url);
+        if (permanentFile != null) return permanentFile;
+      }
+
       final fileInfo = await _cacheManager.getFileFromCache(
         _cacheManager.getCacheKey(url),
       );
@@ -88,5 +101,12 @@ class ImageUtils {
       // Return null if any error occurs
     }
     return null;
+  }
+
+  /// Get total cache size (both temporary and permanent)
+  static Future<int> getTotalCacheSize() async {
+    final tempSize = await _cacheManager.getCacheSize();
+    final permanentSize = await _cacheManager.getCacheSize(permanent: true);
+    return tempSize + permanentSize;
   }
 }
