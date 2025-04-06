@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-// import 'package:http/http.dart' as http;
 
 class CustomCacheManager extends CacheManager {
   static const key = 'imageFlowCache';
@@ -78,31 +77,5 @@ class CustomCacheManager extends CacheManager {
     final uri = Uri.tryParse(url);
     if (uri == null) return '${key}_$url';
     return '${key}_${uri.host}${uri.path}';
-  }
-
-  @override
-  Future<FileInfo> downloadFile(
-    String url, {
-    String? key,
-    Map<String, String>? authHeaders,
-    bool force = false,
-  }) async {
-    try {
-      return await super.downloadFile(
-        url,
-        key: key,
-        authHeaders: authHeaders,
-        force: force,
-      );
-    } catch (e) {
-      // If download fails, try to clear cache for this URL and retry once
-      await removeFile(getCacheKey(url));
-      return await super.downloadFile(
-        url,
-        key: key,
-        authHeaders: authHeaders,
-        force: true,
-      );
-    }
   }
 }
