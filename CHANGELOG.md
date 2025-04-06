@@ -1,3 +1,14 @@
+## 1.0.8
+
+* 🎨 Fixed layout overflow issues in example app
+* 🚀 Improved responsive design and UI components
+* ⚡ Enhanced text overflow handling in lists and cards
+* 🔧 Optimized button layouts and spacing
+* 📱 Added more compact UI elements for better space utilization
+* 💫 Improved scrolling behavior in constrained spaces
+* 🎯 Better handling of long text in labels and titles
+* 🌟 Updated example app with real-world images
+
 ## 1.0.7
 
 * 🔧 Fixed offline mode image loading issues
