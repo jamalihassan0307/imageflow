@@ -5,7 +5,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import '../models/image_config.dart';
 import '../utils/image_utils.dart';
 import '../providers/custom_cache_manager.dart';
 
