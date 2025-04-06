@@ -15,6 +15,7 @@ dependencies:
   transparent_image: ^2.0.1
   connectivity_plus: ^5.0.2
   flutter_cache_manager: ^3.3.1
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_test:
