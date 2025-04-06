@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imageflow/imageflow.dart';
+import 'package:imageflow/src/providers/custom_cache_manager.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
-  const testImageUrl = 'https://example.com/test.jpg';
-  const testSvgUrl = 'https://example.com/test.svg';
+  const testImageUrl = 'https://avatars.githubusercontent.com/u/136632321?v=4';
+  const testSvgUrl = 'https://camo.githubusercontent.com/e12029f1d6292800c6a63b7c134a199d76f99552944e2000beef21abca451162/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f632532332d2532333233393132302e7376673f7374796c653d666f722d7468652d6261646765266c6f676f3d637368617270266c6f676f436f6c6f723d7768697465';
 
   setUpAll(() {
     // Initialize VisibilityDetector for testing
