@@ -8,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
   const testImageUrl = 'https://avatars.githubusercontent.com/u/136632321?v=4';
-  const testSvgUrl = 'https://camo.githubusercontent.com/e12029f1d6292800c6a63b7c134a199d76f99552944e2000beef21abca451162/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f632532332d2532333233393132302e7376673f7374796c653d666f722d7468652d6261646765266c6f676f3d637368617270266c6f676f436f6c6f723d7768697465';
+  const testSvgUrl = '';
 
   setUpAll(() {
     // Initialize VisibilityDetector for testing
@@ -16,6 +16,7 @@ void main() {
   });
 
   group('LazyCacheImage Widget Tests', () {
+    
     testWidgets('shows placeholder when not visible', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(

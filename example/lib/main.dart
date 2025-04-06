@@ -92,11 +92,11 @@ class DemoImage {
 
 final _demoImages = [
   const DemoImage(
-    url: 'https://picsum.photos/400/300?random=1',
+    url: 'https://avatars.githubusercontent.com/u/136632321?v=4',
     description: 'Random Image 1 - Regular JPEG',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/400/300?random=2',
+    url: 'https://avatars.githubusercontent.com/u/136632322?v=4',
     description: 'Random Image 2 - Regular JPEG',
   ),
   const DemoImage(
@@ -104,7 +104,7 @@ final _demoImages = [
     description: 'Android Logo - SVG Example',
   ),
   const DemoImage(
-    url: 'https://media.giphy.com/media/l0HlMZrXA2H7aqpwI/giphy.gif',
+    url: 'https://github.com/jamalihassan0307/jamalihassan0307/raw/main/thoughtworks-gif_dribbble.gif',
     description: 'Animated GIF Example',
   ),
 ]; 
