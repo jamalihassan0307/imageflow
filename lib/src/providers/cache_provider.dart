@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:path_provider/path_provider.dart';
+// import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+// import 'package:path_provider/path_provider.dart';
 import 'custom_cache_manager.dart';
 
 /// Provider class for managing image caching
