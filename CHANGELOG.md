@@ -1,3 +1,13 @@
+## 1.0.5
+
+* 🔧 Fixed image loading issues in debug mode by improving HTTP client configuration
+* 🌐 Added proper SSL certificate handling for debug mode
+* ⚡ Enhanced error handling and retry mechanism for failed image loads
+* 🔄 Added automatic cache clearing on startup for better reliability
+* 📝 Added better debug logging for troubleshooting
+* ⏱️ Set appropriate connection and idle timeouts for image loading
+* 🚀 Updated connectivity_plus dependency to latest version (^6.1.3)
+
 ## 1.0.4
 
 * 🔧 Improved HTTP client configuration in debug mode
