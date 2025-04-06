@@ -195,7 +195,7 @@ class _MainPageState extends State<MainPage> {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Text('Visibility threshold: '),
+                const Text('Visibility: '),
                 Expanded(
                   child: Slider(
                     value: _visibilityFraction,
@@ -214,16 +214,18 @@ class _MainPageState extends State<MainPage> {
                 children: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.45,
-                    child: SwitchListTile(
+                    child: ListTile(
                       title: const Text('Adaptive Loading'),
                       subtitle: const Text('Low to High Quality'),
-                      value: _enableAdaptiveLoading,
-                      onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
+                      trailing: Switch(
+                        value: _enableAdaptiveLoading,
+                        onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
+                      ),
                     ),
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.45,
-                    child: SwitchListTile(
+                    child: ListTile(
                       title: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -240,8 +242,10 @@ class _MainPageState extends State<MainPage> {
                         ],
                       ),
                       subtitle: Text(_isOffline ? 'Using Cached Images' : 'Cache Support'),
-                      value: _enableOfflineMode,
-                      onChanged: _toggleOfflineMode,
+                      trailing: Switch(
+                        value: _enableOfflineMode,
+                        onChanged: _toggleOfflineMode,
+                      ),
                     ),
                   ),
                 ],
@@ -436,9 +440,12 @@ class _MainPageState extends State<MainPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Cache Size: $_cacheSize',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                Expanded(
+                  child: Text(
+                    'Cache Size: $_cacheSize',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 if (_isBatchCaching)
                   Row(
@@ -453,39 +460,45 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        'Saving images...',
-                        style: Theme.of(context).textTheme.bodySmall,
+                      const Text(
+                        'Saving...',
+                        style: TextStyle(fontSize: 12),
                       ),
                     ],
                   ),
               ],
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildBottomButton(
-                  icon: Icons.refresh,
-                  label: 'Prefetch',
-                  onPressed: _prefetchImages,
-                ),
-                _buildBottomButton(
-                  icon: Icons.save_alt,
-                  label: 'Save All',
-                  onPressed: _isBatchCaching ? null : _handleSaveAll,
-                ),
-                _buildBottomButton(
-                  icon: Icons.delete_outline,
-                  label: 'Clear Cache',
-                  onPressed: _clearCache,
-                ),
-                _buildBottomButton(
-                  icon: Icons.info_outline,
-                  label: 'Cache Info',
-                  onPressed: _showCacheInfo,
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildBottomButton(
+                    icon: Icons.refresh,
+                    label: 'Prefetch',
+                    onPressed: _prefetchImages,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildBottomButton(
+                    icon: Icons.save_alt,
+                    label: 'Save All',
+                    onPressed: _isBatchCaching ? null : () { _saveAllImages(); },
+                  ),
+                  const SizedBox(width: 8),
+                  _buildBottomButton(
+                    icon: Icons.delete_outline,
+                    label: 'Clear',
+                    onPressed: _clearCache,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildBottomButton(
+                    icon: Icons.info_outline,
+                    label: 'Info',
+                    onPressed: _showCacheInfo,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -498,12 +511,19 @@ class _MainPageState extends State<MainPage> {
     required String label,
     required VoidCallback? onPressed,
   }) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon),
-      label: Text(label),
-      style: TextButton.styleFrom(
-        foregroundColor: Theme.of(context).colorScheme.primary,
+    return SizedBox(
+      height: 36,
+      child: TextButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 12),
+        ),
+        style: TextButton.styleFrom(
+          foregroundColor: Theme.of(context).colorScheme.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+        ),
       ),
     );
   }
