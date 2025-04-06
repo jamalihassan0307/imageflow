@@ -8,17 +8,18 @@ import 'package:flutter/foundation.dart';
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
+    final client = super.createHttpClient(context)
       ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    client.connectionTimeout = const Duration(seconds: 30);
+    return client;
   }
 }
 
 void main() {
-  // Enable HTTP override in debug mode
+  WidgetsFlutterBinding.ensureInitialized();
   if (kDebugMode) {
     HttpOverrides.global = MyHttpOverrides();
   }
-  
   runApp(const MyApp());
 }
 
@@ -54,33 +55,57 @@ class _MyHomePageState extends State<MyHomePage> {
   double _visibilityFraction = 0.1;
   bool _isGridView = true;
   bool _hasInternetConnection = true;
+  final CacheProvider _cacheProvider = CacheProvider();
 
   @override
   void initState() {
     super.initState();
     _checkInternetConnection();
+    _clearCache();
+  }
+
+  Future<void> _clearCache() async {
+    try {
+      await _cacheProvider.clearAllCache();
+      developer.log('Cache cleared successfully');
+    } on Exception catch (e) {
+      developer.log('Error clearing cache: $e');
+    }
   }
 
   Future<void> _checkInternetConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com');
       final hasConnection = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-      developer.log('Internet connection: $hasConnection');
-      setState(() {
-        _hasInternetConnection = hasConnection;
-      });
-    } on SocketException catch (e) {
-      developer.log('Error checking internet connection: $e');
-      setState(() {
-        _hasInternetConnection = false;
-      });
+      developer.log('Internet connection check: $hasConnection');
+      if (mounted) {
+        setState(() {
+          _hasInternetConnection = hasConnection;
+        });
+      }
+    } on SocketException catch (error) {
+      developer.log('Error checking internet connection: $error');
+      if (mounted) {
+        setState(() {
+          _hasInternetConnection = false;
+        });
+      }
     }
   }
 
   Future<void> _retryLoadingImages() async {
+    developer.log('Retrying image load...');
     await _checkInternetConnection();
-    if (mounted) {
-      setState(() {});
+    if (_hasInternetConnection) {
+      try {
+        await _cacheProvider.clearAllCache();
+        developer.log('Cache cleared for retry');
+        if (mounted) {
+          setState(() {});
+        }
+      } on Exception catch (error) {
+        developer.log('Error during retry: $error');
+      }
     }
   }
 
@@ -150,8 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           try {
-            final cacheProvider = CacheProvider();
-            await cacheProvider.clearAllCache();
+            await _cacheProvider.clearAllCache();
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -160,11 +184,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             }
-          } catch (e) {
+          } on Exception catch (error) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Error clearing cache: $e'),
+                  content: Text('Error clearing cache: $error'),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -217,7 +241,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
                 errorWidget: _buildCustomErrorWidget(
                   onRetry: () => _retryLoadingImages(),
-                  error: 'Failed to load image. Please try again.',
+                  error: !_hasInternetConnection 
+                      ? 'No internet connection'
+                      : 'Failed to load image. Please try again.',
                 ),
                 maxWidth: 600,
                 maxHeight: 800,
@@ -259,22 +285,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildCustomPlaceholder() {
     return Container(
-      color: Colors.grey[100],
+      color: Colors.grey[200],
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.image_outlined,
-              size: 48,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Loading...',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ],
+        child: CircularProgressIndicator(
+          color: Theme.of(context).primaryColor,
         ),
       ),
     );
@@ -350,19 +364,19 @@ class DemoImage {
 }
 
 final _demoImages = [
- const DemoImage(
-    url: 'https://picsum.photos/400/600?random=1',
-    title: 'Random Image 1',
-    description: 'Random image from Picsum Photos',
+  const DemoImage(
+    url: 'https://i.imgur.com/RGLtxuU.jpeg',
+    title: 'Nature Image 1',
+    description: 'Beautiful landscape from Imgur',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/400/600?random=2',
-    title: 'Random Image 2',
-    description: 'Random image from Picsum Photos',
+    url: 'https://i.imgur.com/L7YoqTN.jpeg',
+    title: 'Nature Image 2',
+    description: 'Mountain scenery from Imgur',
   ),
   const DemoImage(
-    url: 'https://picsum.photos/400/600?random=3',
-    title: 'Random Image 3',
-    description: 'Random image from Picsum Photos',
+    url: 'https://i.imgur.com/FWGhbGz.jpeg',
+    title: 'Nature Image 3',
+    description: 'Forest view from Imgur',
   ),
 ];

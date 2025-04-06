@@ -39,6 +39,8 @@ class LazyCacheImage extends StatefulWidget {
   /// Visibility fraction needed to start loading the image (0.0 to 1.0)
   final double visibilityFraction;
 
+  final VoidCallback? onRetry;
+
   const LazyCacheImage({
     super.key,
     required this.imageUrl,
@@ -50,19 +52,25 @@ class LazyCacheImage extends StatefulWidget {
     this.maxHeight,
     this.cacheDuration = const Duration(days: 30),
     this.visibilityFraction = 0.1,
+    this.onRetry,
   });
 
   @override
   State<LazyCacheImage> createState() => _LazyCacheImageState();
 }
 
-class _LazyCacheImageState extends State<LazyCacheImage> {
+class _LazyCacheImageState extends State<LazyCacheImage> with AutomaticKeepAliveClientMixin {
   bool _isVisible = false;
   bool _hasLoaded = false;
+  bool _hasError = false;
   final CustomCacheManager _cacheManager = CustomCacheManager();
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return VisibilityDetector(
       key: Key('image-${widget.imageUrl}'),
       onVisibilityChanged: _handleVisibilityChanged,
@@ -86,6 +94,27 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
     }
   }
 
+  Future<void> _retryLoading() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _hasError = false;
+      _hasLoaded = false;
+      _isVisible = false;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 100));
+    
+    if (mounted) {
+      setState(() {
+        _isVisible = true;
+        _hasLoaded = true;
+      });
+    }
+
+    widget.onRetry?.call();
+  }
+
   Widget _buildImage() {
     if (ImageUtils.isSvgUrl(widget.imageUrl)) {
       return _buildSvgImage(context);
@@ -97,15 +126,17 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
       cacheManager: _cacheManager,
       maxWidthDiskCache: widget.maxWidth?.toInt(),
       maxHeightDiskCache: widget.maxHeight?.toInt(),
-      key: ValueKey(widget.imageUrl),
+      key: ValueKey('${widget.imageUrl}-${_hasError ? 'retry' : 'initial'}'),
       progressIndicatorBuilder: widget.placeholder == null
-          ? (context, url, progress) =>
-              _buildProgressIndicator(context, progress)
+          ? (context, url, progress) => _buildProgressIndicator(context, progress)
           : null,
       placeholder: widget.placeholder != null
           ? (context, url) => widget.placeholder!
           : null,
-      errorWidget: (context, url, error) => _buildErrorWidget(context, error),
+      errorWidget: (context, url, error) {
+        _hasError = true;
+        return _buildErrorWidget(context, error);
+      },
     );
   }
 
@@ -134,12 +165,37 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
   Widget _buildErrorWidget(BuildContext context, dynamic error) {
     if (widget.errorWidget != null) return widget.errorWidget!;
 
-    return Container(
-      color: Colors.grey[200],
-      child: const Center(
-        child: Icon(
-          Icons.error_outline,
-          color: Colors.red,
+    return GestureDetector(
+      onTap: _retryLoading,
+      child: Container(
+        color: Colors.grey[200],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Failed to load image',
+              style: TextStyle(
+                color: Colors.red[700],
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: _retryLoading,
+              icon: const Icon(Icons.refresh, size: 16),
+              label: const Text('Retry'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+              ),
+            ),
+          ],
         ),
       ),
     );
