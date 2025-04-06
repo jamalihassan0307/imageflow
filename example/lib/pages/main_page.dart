@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:imageflow/imageflow.dart';
 import 'image_page.dart';
 import 'dart:developer' as developer;
+import 'package:imageflow/src/providers/custom_cache_manager.dart';
+import 'dart:async';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -18,6 +20,9 @@ class _MainPageState extends State<MainPage> {
   double _visibilityFraction = 0.1;
   final CacheProvider _cacheProvider = CacheProvider();
   Map<String, bool> _cachedImages = {};
+  Map<String, bool> _permanentlyCachedImages = {};
+  String _cacheSize = '0 MB';
+  bool _isBatchCaching = false;
 
   @override
   void initState() {
@@ -25,6 +30,20 @@ class _MainPageState extends State<MainPage> {
     _prefetchImages();
     _checkConnectivity();
     _updateCacheStatus();
+    _updateCacheSize();
+  }
+
+  Future<void> _updateCacheSize() async {
+    try {
+      final size = await _cacheProvider.getCacheSize();
+      if (mounted) {
+        setState(() {
+          _cacheSize = '${(size / 1024 / 1024).toStringAsFixed(2)} MB';
+        });
+      }
+    } catch (e) {
+      developer.log('Error getting cache size: $e');
+    }
   }
 
   Future<void> _checkConnectivity() async {
@@ -43,12 +62,14 @@ class _MainPageState extends State<MainPage> {
     try {
       for (final image in _demoImages) {
         final isCached = await ImageUtils.isImageCached(image.url);
+        final isPermanent = await ImageUtils.isImageCached(image.url, checkPermanent: true);
         if (mounted) {
           setState(() {
             _cachedImages[image.url] = isCached;
+            _permanentlyCachedImages[image.url] = isPermanent;
           });
         }
-        developer.log('Cache status for ${image.url}: $isCached');
+        developer.log('Cache status for ${image.url}: $isCached (permanent: $isPermanent)');
       }
     } catch (e) {
       developer.log('Error updating cache status: $e');
@@ -62,12 +83,14 @@ class _MainPageState extends State<MainPage> {
         try {
           await ImageUtils.prefetchImages([img.url]);
           final isCached = await ImageUtils.isImageCached(img.url);
+          final isPermanent = await ImageUtils.isImageCached(img.url, checkPermanent: true);
           if (mounted) {
             setState(() {
               _cachedImages[img.url] = isCached;
+              _permanentlyCachedImages[img.url] = isPermanent;
             });
           }
-          developer.log('Prefetched and cached: ${img.url} - Success: $isCached');
+          developer.log('Prefetched and cached: ${img.url} - Success: $isCached (permanent: $isPermanent)');
         } catch (e) {
           developer.log('Error prefetching image ${img.url}: $e');
         }
@@ -76,6 +99,7 @@ class _MainPageState extends State<MainPage> {
       developer.log('Error during prefetch: $e');
     }
     await _updateCacheStatus();
+    await _updateCacheSize();
     developer.log('Prefetching complete');
   }
 
@@ -256,6 +280,7 @@ class _MainPageState extends State<MainPage> {
 
   Widget _buildImageCard(DemoImage image) {
     final isCached = _cachedImages[image.url] ?? false;
+    final isPermanent = _permanentlyCachedImages[image.url] ?? false;
     
     return Card(
       child: InkWell(
@@ -269,7 +294,10 @@ class _MainPageState extends State<MainPage> {
               isOffline: _isOffline,
             ),
           ),
-        ),
+        ).then((_) {
+          _updateCacheStatus();
+          _updateCacheSize();
+        }),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -331,13 +359,13 @@ class _MainPageState extends State<MainPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.save,
+                            isPermanent ? Icons.save : Icons.cached,
                             color: Colors.white,
                             size: 14,
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Cached',
+                            isPermanent ? 'Saved Offline' : 'Cached',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -370,7 +398,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                       if (isCached)
                         Icon(
-                          Icons.check_circle,
+                          isPermanent ? Icons.save : Icons.check_circle,
                           color: Colors.green,
                           size: 16,
                         ),
@@ -394,38 +422,70 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  void _handleSaveAll() {
+    _saveAllImages();
+  }
+
   Widget _buildBottomBar() {
     return BottomAppBar(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _buildBottomButton(
-              icon: Icons.refresh,
-              label: 'Prefetch',
-              onPressed: _prefetchImages,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Cache Size: $_cacheSize',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (_isBatchCaching)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Saving images...',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+              ],
             ),
-            _buildBottomButton(
-              icon: Icons.delete_outline,
-              label: 'Clear Cache',
-              onPressed: _clearCache,
-            ),
-            _buildBottomButton(
-              icon: Icons.info_outline,
-              label: 'Cache Info',
-              onPressed: () async {
-                final size = await _cacheProvider.getCacheSize();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Cache size: ${(size / 1024 / 1024).toStringAsFixed(2)} MB'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              },
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildBottomButton(
+                  icon: Icons.refresh,
+                  label: 'Prefetch',
+                  onPressed: _prefetchImages,
+                ),
+                _buildBottomButton(
+                  icon: Icons.save_alt,
+                  label: 'Save All',
+                  onPressed: _isBatchCaching ? null : _handleSaveAll,
+                ),
+                _buildBottomButton(
+                  icon: Icons.delete_outline,
+                  label: 'Clear Cache',
+                  onPressed: _clearCache,
+                ),
+                _buildBottomButton(
+                  icon: Icons.info_outline,
+                  label: 'Cache Info',
+                  onPressed: _showCacheInfo,
+                ),
+              ],
             ),
           ],
         ),
@@ -436,7 +496,7 @@ class _MainPageState extends State<MainPage> {
   Widget _buildBottomButton({
     required IconData icon,
     required String label,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return TextButton.icon(
       onPressed: onPressed,
@@ -452,6 +512,7 @@ class _MainPageState extends State<MainPage> {
     try {
       await _cacheProvider.clearAllCache();
       await _updateCacheStatus();
+      await _updateCacheSize();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -469,6 +530,59 @@ class _MainPageState extends State<MainPage> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _saveAllImages() async {
+    setState(() => _isBatchCaching = true);
+    try {
+      for (final image in _demoImages) {
+        if (!(_permanentlyCachedImages[image.url] ?? false)) {
+          final file = await _cacheProvider.getFile(image.url);
+          await CustomCacheManager().storeFileInPermanentCache(image.url, file);
+        }
+      }
+      await _updateCacheStatus();
+      await _updateCacheSize();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('All images saved for offline use'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving images: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isBatchCaching = false);
+      }
+    }
+  }
+
+  void _showCacheInfo() async {
+    final permanentCount = _permanentlyCachedImages.values.where((v) => v).length;
+    final temporaryCount = _cachedImages.values.where((v) => v).length - permanentCount;
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Cache size: $_cacheSize\n'
+            'Permanent images: $permanentCount\n'
+            'Temporary images: $temporaryCount'
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 }

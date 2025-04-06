@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imageflow/imageflow.dart';
 import 'main_page.dart';
 import 'dart:developer' as developer;
+import 'package:imageflow/src/providers/custom_cache_manager.dart';
 
 class ImagePage extends StatefulWidget {
   final DemoImage image;
@@ -25,6 +26,7 @@ class _ImagePageState extends State<ImagePage> {
   bool _isLoading = false;
   bool _isHighQuality = false;
   bool _isCached = false;
+  bool _isPermanentlyCached = false;
   final CacheProvider _cacheProvider = CacheProvider();
 
   @override
@@ -35,12 +37,14 @@ class _ImagePageState extends State<ImagePage> {
 
   Future<void> _checkImageCache() async {
     final isCached = await ImageUtils.isImageCached(widget.image.url);
+    final isPermanent = await ImageUtils.isImageCached(widget.image.url, checkPermanent: true);
     if (mounted) {
       setState(() {
         _isCached = isCached;
+        _isPermanentlyCached = isPermanent;
       });
     }
-    developer.log('Image cached status: $isCached');
+    developer.log('Image cached status: $isCached (permanent: $isPermanent)');
   }
 
   Future<void> _toggleImageQuality() async {
@@ -166,9 +170,9 @@ class _ImagePageState extends State<ImagePage> {
                 icon: Icons.auto_awesome,
               ),
               _buildStatusChip(
-                label: 'Cached',
+                label: _isPermanentlyCached ? 'Saved Offline' : 'Cached',
                 value: _isCached,
-                icon: Icons.save,
+                icon: _isPermanentlyCached ? Icons.save : Icons.cached,
               ),
               _buildStatusChip(
                 label: 'High Quality',
@@ -347,13 +351,13 @@ class _ImagePageState extends State<ImagePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.save,
+                        _isPermanentlyCached ? Icons.save : Icons.cached,
                         color: Colors.green,
                         size: 16,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Cached',
+                        _isPermanentlyCached ? 'Saved Offline' : 'Cached',
                         style: TextStyle(
                           color: Colors.green,
                           fontSize: 12,
@@ -390,6 +394,35 @@ class _ImagePageState extends State<ImagePage> {
                 icon: const Icon(Icons.delete_outline),
                 label: const Text('Clear Cache'),
               ),
+              if (!_isPermanentlyCached)
+                TextButton.icon(
+                  onPressed: () async {
+                    try {
+                      final file = await _cacheProvider.getFile(widget.image.url);
+                      await CustomCacheManager().storeFileInPermanentCache(widget.image.url, file);
+                      await _checkImageCache();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Image saved for offline use'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error saving image: $e'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.save_alt),
+                  label: const Text('Save Offline'),
+                ),
               if (widget.enableAdaptiveLoading && (!widget.isOffline || _isCached))
                 TextButton.icon(
                   onPressed: _toggleImageQuality,
