@@ -94,15 +94,17 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
     return CachedNetworkImage(
       imageUrl: widget.imageUrl,
       fit: widget.fit,
-      placeholder: (context, url) => _buildPlaceholder(context),
-      errorWidget: (context, url, error) => _buildErrorWidget(context, error),
-      progressIndicatorBuilder: (context, url, progress) {
-        return _buildProgressIndicator(context, progress);
-      },
       cacheManager: _cacheManager,
       maxWidthDiskCache: widget.maxWidth?.toInt(),
       maxHeightDiskCache: widget.maxHeight?.toInt(),
       key: ValueKey(widget.imageUrl),
+      progressIndicatorBuilder: widget.placeholder == null 
+          ? (context, url, progress) => _buildProgressIndicator(context, progress)
+          : null,
+      placeholder: widget.placeholder != null 
+          ? (context, url) => widget.placeholder!
+          : null,
+      errorWidget: (context, url, error) => _buildErrorWidget(context, error),
     );
   }
 
@@ -120,9 +122,8 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
     return Container(
       color: Colors.grey[200],
       child: Center(
-        child: Image.memory(
-          kTransparentImage,
-          fit: widget.fit,
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
         ),
       ),
     );
