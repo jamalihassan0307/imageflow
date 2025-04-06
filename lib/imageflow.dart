@@ -1,5 +1,3 @@
-library imageflow;
-
 export 'src/widgets/lazy_cache_image.dart';
 export 'src/models/image_config.dart';
 export 'src/utils/image_utils.dart';
