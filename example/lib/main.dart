@@ -53,7 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // Toggle between placeholder and progress indicator
           IconButton(
             icon: Icon(_showPlaceholder ? Icons.refresh : Icons.downloading),
-            onPressed: () => setState(() => _showPlaceholder = !_showPlaceholder),
+            onPressed: () =>
+                setState(() => _showPlaceholder = !_showPlaceholder),
             tooltip: 'Toggle placeholder/progress',
           ),
         ],
@@ -68,7 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Settings', 
+                  Text(
+                    'Settings',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
@@ -82,7 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           max: 1.0,
                           divisions: 10,
                           label: '${(_visibilityFraction * 100).round()}%',
-                          onChanged: (value) => setState(() => _visibilityFraction = value),
+                          onChanged: (value) =>
+                              setState(() => _visibilityFraction = value),
                         ),
                       ),
                     ],
@@ -164,7 +167,8 @@ class _MyHomePageState extends State<MyHomePage> {
               child: LazyCacheImage(
                 imageUrl: image.url,
                 fit: BoxFit.cover,
-                placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
+                placeholder:
+                    _showPlaceholder ? _buildCustomPlaceholder() : null,
                 errorWidget: _buildCustomErrorWidget(),
                 maxWidth: 600,
                 maxHeight: 800,
@@ -180,8 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text(
                   image.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -280,7 +284,8 @@ final _demoImages = [
     description: 'High-quality random nature image from Picsum Photos',
   ),
   const DemoImage(
-    url: 'https://raw.githubusercontent.com/flutter/website/main/src/assets/images/flutter-logo-sharing.png',
+    url:
+        'https://raw.githubusercontent.com/flutter/website/main/src/assets/images/flutter-logo-sharing.png',
     title: 'Flutter Logo',
     description: 'Official Flutter logo from GitHub',
   ),
@@ -304,4 +309,4 @@ final _demoImages = [
     title: 'Abstract Art',
     description: 'Abstract artistic photography with vibrant colors',
   ),
-]; 
+];

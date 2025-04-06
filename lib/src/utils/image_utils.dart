@@ -9,8 +9,8 @@ class ImageUtils {
   static Future<bool> hasInternetConnection() async {
     final connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult == ConnectivityResult.wifi ||
-           connectivityResult == ConnectivityResult.mobile ||
-           connectivityResult == ConnectivityResult.ethernet;
+        connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.ethernet;
   }
 
   /// Calculate optimal image dimensions based on screen size
