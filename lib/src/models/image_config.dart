@@ -5,6 +5,9 @@ class ImageConfig {
   /// The URL of the image to load
   final String imageUrl;
 
+  /// Low resolution version of the image URL for adaptive loading
+  final String? lowResUrl;
+
   /// How to inscribe the image into the space allocated during layout
   final BoxFit fit;
 
@@ -26,8 +29,15 @@ class ImageConfig {
   /// Maximum height to load the image at
   final double? maxHeight;
 
+  /// Whether to prefetch this image
+  final bool shouldPrefetch;
+
+  /// Whether to attempt loading from cache first in offline mode
+  final bool enableOfflineMode;
+
   const ImageConfig({
     required this.imageUrl,
+    this.lowResUrl,
     this.fit = BoxFit.cover,
     this.placeholder,
     this.errorWidget,
@@ -35,11 +45,14 @@ class ImageConfig {
     this.cacheDuration = const Duration(days: 30),
     this.maxWidth,
     this.maxHeight,
+    this.shouldPrefetch = false,
+    this.enableOfflineMode = true,
   });
 
   /// Creates a copy of this configuration with the given fields replaced
   ImageConfig copyWith({
     String? imageUrl,
+    String? lowResUrl,
     BoxFit? fit,
     Widget? placeholder,
     Widget? errorWidget,
@@ -47,17 +60,21 @@ class ImageConfig {
     Duration? cacheDuration,
     double? maxWidth,
     double? maxHeight,
+    bool? shouldPrefetch,
+    bool? enableOfflineMode,
   }) {
     return ImageConfig(
       imageUrl: imageUrl ?? this.imageUrl,
+      lowResUrl: lowResUrl ?? this.lowResUrl,
       fit: fit ?? this.fit,
       placeholder: placeholder ?? this.placeholder,
       errorWidget: errorWidget ?? this.errorWidget,
-      enableAdaptiveLoading:
-          enableAdaptiveLoading ?? this.enableAdaptiveLoading,
+      enableAdaptiveLoading: enableAdaptiveLoading ?? this.enableAdaptiveLoading,
       cacheDuration: cacheDuration ?? this.cacheDuration,
       maxWidth: maxWidth ?? this.maxWidth,
       maxHeight: maxHeight ?? this.maxHeight,
+      shouldPrefetch: shouldPrefetch ?? this.shouldPrefetch,
+      enableOfflineMode: enableOfflineMode ?? this.enableOfflineMode,
     );
   }
 }
