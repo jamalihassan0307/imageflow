@@ -1,3 +1,14 @@
+## 1.0.6
+
+* 🖼️ Added support for adaptive image quality loading with low-res to high-res transitions
+* 🔄 Added image prefetching capabilities with `ImageUtils.prefetchImages`
+* 📱 Enhanced offline mode support with automatic cache fallback
+* 💫 Improved placeholder and error widgets with better UX
+* 🔍 Added interactive image viewer support with pinch-to-zoom
+* 📝 Added comprehensive usage examples in documentation
+* ⚡ Performance improvements in image loading and caching
+* 🎨 Enhanced example app with new features demonstration
+
 ## 1.0.5
 
 * 🔧 Fixed image loading issues in debug mode by improving HTTP client configuration
