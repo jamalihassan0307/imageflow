@@ -8,6 +8,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../models/image_config.dart';
 import '../utils/image_utils.dart';
 import '../providers/cache_provider.dart';
+import '../providers/custom_cache_manager.dart';
 
 /// A widget that displays a network image with lazy loading and caching capabilities
 class LazyCacheImage extends StatefulWidget {
@@ -58,6 +59,7 @@ class LazyCacheImage extends StatefulWidget {
 class _LazyCacheImageState extends State<LazyCacheImage> {
   bool _isVisible = false;
   bool _hasLoaded = false;
+  final CustomCacheManager _cacheManager = CustomCacheManager();
 
   @override
   Widget build(BuildContext context) {
@@ -97,9 +99,10 @@ class _LazyCacheImageState extends State<LazyCacheImage> {
       progressIndicatorBuilder: (context, url, progress) {
         return _buildProgressIndicator(context, progress);
       },
-      cacheManager: DefaultCacheManager(),
+      cacheManager: _cacheManager,
       maxWidthDiskCache: widget.maxWidth?.toInt(),
       maxHeightDiskCache: widget.maxHeight?.toInt(),
+      key: ValueKey(widget.imageUrl),
     );
   }
 
