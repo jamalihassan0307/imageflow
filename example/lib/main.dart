@@ -223,28 +223,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildProgressIndicator(double progress) {
-    return Container(
-      color: Colors.grey[100],
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(
-              value: progress,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${(progress * 100).round()}%',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildCustomErrorWidget() {
     return Container(
       color: Colors.grey[100],
