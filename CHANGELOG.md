@@ -1,3 +1,10 @@
+## 1.0.3
+
+* 🔄 Updated dependencies to latest versions
+* 🐛 Fixed progress indicator implementation
+* 🎨 Improved error widget handling
+* ⚡ Performance optimizations
+
 ## 1.0.2
 
 * 📚 Updated documentation and README with professional header and footer
