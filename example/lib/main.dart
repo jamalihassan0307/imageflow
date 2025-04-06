@@ -17,7 +17,7 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   if (kDebugMode) {
     HttpOverrides.global = MyHttpOverrides();
     developer.log('Debug mode: Using custom HTTP client configuration');
@@ -88,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _checkInternetConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com');
-      final hasConnection = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      final hasConnection =
+          result.isNotEmpty && result[0].rawAddress.isNotEmpty;
       developer.log('Internet connection check: $hasConnection');
       if (mounted) {
         setState(() {
@@ -240,7 +241,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildImageCard(DemoImage image) {
-    print("image.url${image.url}");
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -251,10 +251,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: LazyCacheImage(
                 imageUrl: image.url,
                 fit: BoxFit.cover,
-                placeholder: _showPlaceholder ? _buildCustomPlaceholder() : null,
+                placeholder:
+                    _showPlaceholder ? _buildCustomPlaceholder() : null,
                 errorWidget: _buildCustomErrorWidget(
                   onRetry: () => _retryLoadingImages(),
-                  error: !_hasInternetConnection 
+                  error: !_hasInternetConnection
                       ? 'No internet connection'
                       : 'Failed to load image. Please try again.',
                 ),
