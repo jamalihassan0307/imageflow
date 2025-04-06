@@ -11,29 +11,84 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+# ImageFlow 📷
 
-## Features
+An advanced image loader for Flutter with caching, placeholders, and progressive loading. ImageFlow provides optimized lazy loading capabilities, ensuring your app's images load efficiently and smoothly.
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+## ✨ Features
 
-## Getting started
+🏎️ **Optimized Lazy Loading**
+- Loads images only when they become visible in the viewport
+- Reduces memory usage and initial load time
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+🛠️ **Advanced Caching Support**
+- Efficient local storage caching
+- Customizable cache duration
+- Automatic cache management
 
-## Usage
+🔄 **Placeholder & Error Handling**
+- Customizable loading placeholders
+- Elegant error states
+- Smooth transitions between states
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+📱 **Adaptive Image Quality**
+- Progressive image loading
+- Low-res to high-res transitions
+- Bandwidth-aware loading
 
-```dart
-const like = 'sample';
+🚀 **Prefetching & Preloading**
+- Smart preloading of off-screen images
+- Configurable prefetch policies
+- Background loading support
+
+🌍 **Network & Offline Support**
+- Offline-first approach
+- Automatic network state detection
+- Fallback mechanisms for offline usage
+
+🎨 **Extended Format Support**
+- GIF support
+- SVG rendering
+- Extensible format handlers
+
+## 🚀 Getting Started
+
+Add this to your package's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  imageflow: ^1.0.0
 ```
 
-## Additional information
+## 💻 Usage
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+import 'package:imageflow/imageflow.dart';
+
+// Basic usage
+ImageFlow(
+  url: 'https://example.com/image.jpg',
+)
+
+// Advanced usage with all features
+ImageFlow(
+  url: 'https://example.com/image.jpg',
+  placeholder: 'assets/placeholder.png',
+  errorWidget: (context, error) => Icon(Icons.error),
+  progressIndicatorBuilder: (context, progress) => CircularProgressIndicator(),
+  cacheManager: CustomCacheManager(),
+  preload: true,
+)
+```
+
+## 📚 Documentation
+
+For detailed documentation and examples, visit our [Wiki](https://github.com/yourusername/imageflow/wiki).
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) first.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
