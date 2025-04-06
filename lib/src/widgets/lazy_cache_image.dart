@@ -167,7 +167,9 @@ class _LazyCacheImageState extends State<LazyCacheImage>
       return _buildSvgImage(context);
     }
 
-    final url = widget.enableAdaptiveLoading && widget.lowResUrl != null && !_isLoadingHighRes
+    final url = widget.enableAdaptiveLoading &&
+            widget.lowResUrl != null &&
+            !_isLoadingHighRes
         ? widget.lowResUrl!
         : widget.imageUrl;
 
@@ -179,7 +181,8 @@ class _LazyCacheImageState extends State<LazyCacheImage>
       maxHeightDiskCache: widget.maxHeight?.toInt(),
       key: ValueKey('$url-${_hasError ? 'retry' : 'initial'}'),
       progressIndicatorBuilder: widget.placeholder == null
-          ? (context, url, progress) => _buildProgressIndicator(context, progress)
+          ? (context, url, progress) =>
+              _buildProgressIndicator(context, progress)
           : null,
       placeholder: widget.placeholder != null
           ? (context, url) => widget.placeholder!
@@ -261,9 +264,7 @@ class _LazyCacheImageState extends State<LazyCacheImage>
             ),
             const SizedBox(height: 8),
             Text(
-              _isOffline
-                  ? 'No internet connection'
-                  : 'Failed to load image',
+              _isOffline ? 'No internet connection' : 'Failed to load image',
               style: TextStyle(
                 color: Colors.red[700],
                 fontSize: 12,

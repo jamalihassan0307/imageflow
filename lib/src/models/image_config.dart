@@ -69,7 +69,8 @@ class ImageConfig {
       fit: fit ?? this.fit,
       placeholder: placeholder ?? this.placeholder,
       errorWidget: errorWidget ?? this.errorWidget,
-      enableAdaptiveLoading: enableAdaptiveLoading ?? this.enableAdaptiveLoading,
+      enableAdaptiveLoading:
+          enableAdaptiveLoading ?? this.enableAdaptiveLoading,
       cacheDuration: cacheDuration ?? this.cacheDuration,
       maxWidth: maxWidth ?? this.maxWidth,
       maxHeight: maxHeight ?? this.maxHeight,

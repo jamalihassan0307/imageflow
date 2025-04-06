@@ -117,7 +117,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  imageflow: ^1.0.5
+  imageflow: ^1.0.6
 ```
 
 
@@ -161,6 +161,52 @@ LazyCacheImage(
   maxHeight: 300,
   visibilityFraction: 0.1,
   cacheDuration: const Duration(days: 7),
+)
+```
+
+### Adaptive Quality Loading
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/high-quality.jpg',
+  lowResUrl: 'https://example.com/low-quality.jpg',
+  enableAdaptiveLoading: true,
+  fit: BoxFit.cover,
+)
+```
+
+### Offline Mode Support
+```dart
+LazyCacheImage(
+  imageUrl: 'https://example.com/image.jpg',
+  enableOfflineMode: true,
+  placeholder: const Text('Loading from cache...'),
+)
+```
+
+### With Prefetching
+```dart
+// Prefetch multiple images
+await ImageUtils.prefetchImages([
+  'https://example.com/image1.jpg',
+  'https://example.com/image2.jpg',
+]);
+
+// Use in widget
+LazyCacheImage(
+  imageUrl: 'https://example.com/image1.jpg',
+  enableOfflineMode: true,
+)
+```
+
+### Interactive Image Viewer
+```dart
+InteractiveViewer(
+  minScale: 0.5,
+  maxScale: 4.0,
+  child: LazyCacheImage(
+    imageUrl: 'https://example.com/image.jpg',
+    fit: BoxFit.contain,
+  ),
 )
 ```
 
