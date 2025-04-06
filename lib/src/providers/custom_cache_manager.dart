@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 
 class CustomCacheManager extends CacheManager {
   static const key = 'imageFlowCache';
+  static const permanentKey = 'imageFlowPermanentCache';
   static const maxAgeCacheObject = Duration(days: 30);
   static const maxNrOfCacheObjects = 1000;
 
@@ -26,22 +27,24 @@ class CustomCacheManager extends CacheManager {
           fileService: HttpFileService(),
         ));
 
-  Future<String> getCachePath() async {
-    final directory = await getTemporaryDirectory();
-    return p.join(directory.path, key);
+  Future<String> getCachePath({bool permanent = false}) async {
+    final directory = permanent 
+        ? await getApplicationDocumentsDirectory()
+        : await getTemporaryDirectory();
+    return p.join(directory.path, permanent ? permanentKey : key);
   }
 
-  Future<void> clearCache() async {
+  Future<void> clearCache({bool permanent = false}) async {
     try {
       await emptyCache();
-      final directory = Directory(await getCachePath());
+      final directory = Directory(await getCachePath(permanent: permanent));
       if (await directory.exists()) {
         await directory.delete(recursive: true);
       }
     } catch (e) {
       // Handle error silently but ensure the cache is cleared
       try {
-        final directory = Directory(await getCachePath());
+        final directory = Directory(await getCachePath(permanent: permanent));
         if (await directory.exists()) {
           await directory.delete(recursive: true);
         }
@@ -51,9 +54,9 @@ class CustomCacheManager extends CacheManager {
     }
   }
 
-  Future<int> getCacheSize() async {
+  Future<int> getCacheSize({bool permanent = false}) async {
     try {
-      final directory = Directory(await getCachePath());
+      final directory = Directory(await getCachePath(permanent: permanent));
       if (!await directory.exists()) return 0;
 
       int size = 0;
@@ -73,9 +76,35 @@ class CustomCacheManager extends CacheManager {
     }
   }
 
-  String getCacheKey(String url) {
+  String getCacheKey(String url, {bool permanent = false}) {
     final uri = Uri.tryParse(url);
-    if (uri == null) return '${key}_$url';
-    return '${key}_${uri.host}${uri.path}';
+    final prefix = permanent ? permanentKey : key;
+    if (uri == null) return '${prefix}_$url';
+    return '${prefix}_${uri.host}${uri.path}';
+  }
+
+  Future<File?> getFileFromPermanentCache(String url) async {
+    try {
+      final cacheKey = getCacheKey(url, permanent: true);
+      final cachePath = await getCachePath(permanent: true);
+      final file = File(p.join(cachePath, cacheKey));
+      if (await file.exists()) {
+        return file;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<void> storeFileInPermanentCache(String url, File file) async {
+    try {
+      final cacheKey = getCacheKey(url, permanent: true);
+      final cachePath = await getCachePath(permanent: true);
+      final directory = Directory(cachePath);
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      final permanentFile = File(p.join(cachePath, cacheKey));
+      await file.copy(permanentFile.path);
+    } catch (_) {}
   }
 }
