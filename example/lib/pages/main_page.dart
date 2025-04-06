@@ -14,13 +14,40 @@ class _MainPageState extends State<MainPage> {
   bool _isGridView = true;
   bool _enableAdaptiveLoading = true;
   bool _enableOfflineMode = true;
+  bool _isOffline = false;
   double _visibilityFraction = 0.1;
   final CacheProvider _cacheProvider = CacheProvider();
+  Map<String, bool> _cachedImages = {};
 
   @override
   void initState() {
     super.initState();
     _prefetchImages();
+    _checkConnectivity();
+    _updateCacheStatus();
+  }
+
+  Future<void> _checkConnectivity() async {
+    final hasConnection = await ImageUtils.hasInternetConnection();
+    if (mounted) {
+      setState(() {
+        _isOffline = !hasConnection;
+        if (_isOffline) {
+          _enableOfflineMode = true;
+        }
+      });
+    }
+  }
+
+  Future<void> _updateCacheStatus() async {
+    for (final image in _demoImages) {
+      final isCached = await ImageUtils.isImageCached(image.url);
+      if (mounted) {
+        setState(() {
+          _cachedImages[image.url] = isCached;
+        });
+      }
+    }
   }
 
   Future<void> _prefetchImages() async {
@@ -28,7 +55,33 @@ class _MainPageState extends State<MainPage> {
     await ImageUtils.prefetchImages(
       _demoImages.map((img) => img.url).toList(),
     );
+    await _updateCacheStatus();
     developer.log('Prefetching complete');
+  }
+
+  Future<void> _toggleOfflineMode(bool value) async {
+    if (value) {
+      // If enabling offline mode, check if we have internet first
+      final hasConnection = await ImageUtils.hasInternetConnection();
+      if (!hasConnection) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No internet connection available'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _enableOfflineMode = value;
+        if (value) {
+          _checkConnectivity();
+        }
+      });
+    }
   }
 
   @override
@@ -47,6 +100,7 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Column(
         children: [
+          _buildNetworkStatus(),
           _buildControlPanel(),
           Expanded(
             child: _isGridView ? _buildGrid() : _buildList(),
@@ -54,6 +108,31 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget _buildNetworkStatus() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      color: _isOffline ? Colors.orange.withOpacity(0.2) : Colors.green.withOpacity(0.2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            _isOffline ? Icons.cloud_off : Icons.cloud_done,
+            color: _isOffline ? Colors.orange : Colors.green,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            _isOffline ? 'Offline Mode - Using Cached Images' : 'Online Mode',
+            style: TextStyle(
+              color: _isOffline ? Colors.orange[700] : Colors.green[700],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -80,8 +159,7 @@ class _MainPageState extends State<MainPage> {
                     max: 1.0,
                     divisions: 10,
                     label: '${(_visibilityFraction * 100).round()}%',
-                    onChanged: (value) =>
-                        setState(() => _visibilityFraction = value),
+                    onChanged: (value) => setState(() => _visibilityFraction = value),
                   ),
                 ),
               ],
@@ -93,17 +171,28 @@ class _MainPageState extends State<MainPage> {
                     title: const Text('Adaptive Loading'),
                     subtitle: const Text('Low to High Quality'),
                     value: _enableAdaptiveLoading,
-                    onChanged: (value) =>
-                        setState(() => _enableAdaptiveLoading = value),
+                    onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
                   ),
                 ),
                 Expanded(
                   child: SwitchListTile(
-                    title: const Text('Offline Mode'),
-                    subtitle: const Text('Cache Support'),
+                    title: Row(
+                      children: [
+                        const Text('Offline Mode'),
+                        if (_isOffline)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Icon(
+                              Icons.cloud_off,
+                              size: 16,
+                              color: Colors.orange[700],
+                            ),
+                          ),
+                      ],
+                    ),
+                    subtitle: Text(_isOffline ? 'Using Cached Images' : 'Cache Support'),
                     value: _enableOfflineMode,
-                    onChanged: (value) =>
-                        setState(() => _enableOfflineMode = value),
+                    onChanged: _toggleOfflineMode,
                   ),
                 ),
               ],
@@ -140,6 +229,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildImageCard(DemoImage image) {
+    final isCached = _cachedImages[image.url] ?? false;
+    
     return Card(
       child: InkWell(
         onTap: () => Navigator.push(
@@ -149,26 +240,61 @@ class _MainPageState extends State<MainPage> {
               image: image,
               enableAdaptiveLoading: _enableAdaptiveLoading,
               enableOfflineMode: _enableOfflineMode,
+              isOffline: _isOffline,
             ),
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: Hero(
-                tag: image.url,
-                child: LazyCacheImage(
-                  imageUrl: image.url,
-                  lowResUrl: _enableAdaptiveLoading
-                      ? ImageUtils.getLowQualityUrl(image.url)
-                      : null,
-                  fit: BoxFit.cover,
-                  enableAdaptiveLoading: _enableAdaptiveLoading,
-                  enableOfflineMode: _enableOfflineMode,
-                  visibilityFraction: _visibilityFraction,
+            Stack(
+              children: [
+                Expanded(
+                  child: Hero(
+                    tag: image.url,
+                    child: LazyCacheImage(
+                      imageUrl: image.url,
+                      lowResUrl: _enableAdaptiveLoading
+                          ? ImageUtils.getLowQualityUrl(image.url)
+                          : null,
+                      fit: BoxFit.cover,
+                      enableAdaptiveLoading: _enableAdaptiveLoading,
+                      enableOfflineMode: _enableOfflineMode,
+                      visibilityFraction: _visibilityFraction,
+                    ),
+                  ),
                 ),
-              ),
+                if (isCached)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.save,
+                            color: Colors.white,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Cached',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(8),
@@ -176,14 +302,26 @@ class _MainPageState extends State<MainPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    image.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          image.title,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isCached)
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
