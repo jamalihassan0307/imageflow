@@ -11,7 +11,56 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-# ImageFlow 📷
+<div align="center">
+  <kbd>
+    <img src="https://github.com/jamalihassan0307/imageflow/blob/main/image/image.jpg?raw=true" width="250" alt="ImageFlow"/>
+  </kbd>
+  
+  <h1>🌟 ImageFlow 🌟</h1>
+  <p><i>An advanced Flutter package for optimized image loading with caching and lazy loading capabilities</i></p>
+  
+  <p align="center">
+    <a href="https://github.com/jamalihassan0307">
+      <img src="https://img.shields.io/badge/Created_by-Jam_Ali_Hassan-blue?style=for-the-badge&logo=github&logoColor=white" alt="Created by"/>
+    </a>
+  </p>
+
+  <p align="center">
+    <a href="https://github.com/jamalihassan0307">
+      <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+    </a>
+    <a href="https://www.linkedin.com/in/jamalihassan0307">
+      <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/>
+    </a>
+    <a href="https://jamalihassan0307.github.io/portfolio.github.io">
+      <img src="https://img.shields.io/badge/Portfolio-255E63?style=for-the-badge&logo=About.me&logoColor=white" alt="Portfolio"/>
+    </a>
+  </p>
+
+  <p align="center">
+    <a href="https://pub.dev/packages/imageflow">
+      <img src="https://img.shields.io/pub/v/imageflow?style=for-the-badge&logo=dart&logoColor=white" alt="Pub Version"/>
+    </a>
+    <a href="https://flutter.dev">
+      <img src="https://img.shields.io/badge/Platform-Flutter-02569B?style=for-the-badge&logo=flutter" alt="Platform"/>
+    </a>
+    <a href="https://opensource.org/licenses/MIT">
+      <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License: MIT"/>
+    </a>
+  </p>
+
+  <p align="center">
+    <a href="https://pub.dev/packages/imageflow">
+      <img src="https://img.shields.io/pub/likes/imageflow?style=for-the-badge&logo=flutter&logoColor=white&label=Pub%20Likes" alt="Pub Likes"/>
+    </a>
+    <a href="https://pub.dev/packages/imageflow">
+      <img src="https://img.shields.io/pub/points/imageflow?style=for-the-badge&logo=flutter&logoColor=white&label=Pub%20Points" alt="Pub Points"/>
+    </a>
+    <a href="https://pub.dev/packages/imageflow">
+      <img src="https://img.shields.io/pub/popularity/imageflow?style=for-the-badge&logo=flutter&logoColor=white&label=Popularity" alt="Popularity"/>
+    </a>
+  </p>
+</div>
 
 An advanced image loader for Flutter with caching, placeholders, and progressive loading. ImageFlow provides optimized lazy loading capabilities, ensuring your app's images load efficiently and smoothly.
 
@@ -155,3 +204,14 @@ Contributions are welcome! Please read our contributing guidelines first.
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+If you find this package helpful, please give it a star on [GitHub](https://github.com/jamalihassan0307/imageflow)!
+
+## Contact
+
+- 👨‍💻 Developed by [Jam Ali Hassan](https://github.com/jamalihassan0307)
+- 🌐 [Portfolio](https://jamalihassan0307.github.io/portfolio.github.io)
+- 📧 Email: jamalihassan0307@gmail.com
+- 🔗 [LinkedIn](https://www.linkedin.com/in/jamalihassan0307)
