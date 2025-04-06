@@ -1,7 +1,7 @@
 name: imageflow
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "An advanced image loader for Flutter with caching, placeholders, and progressive loading."
+version: 1.0.0
+homepage: https://github.com/yourusername/imageflow
 
 environment:
   sdk: ^3.5.3
@@ -10,6 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10+1
+  transparent_image: ^2.0.1
+  connectivity_plus: ^5.0.2
+  flutter_cache_manager: ^3.3.1
 
 dev_dependencies:
   flutter_test:
