@@ -106,7 +106,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  imageflow: ^1.0.1
+  imageflow: ^1.0.2
 ```
 
 ## 💻 Usage Examples
