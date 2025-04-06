@@ -18,14 +18,14 @@ void main() {
   group('LazyCacheImage Widget Tests', () {
     testWidgets('shows placeholder when not visible', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: SingleChildScrollView(
             child: Column(
               children: [
                 SizedBox(height: 1000), // Push image below viewport
                 LazyCacheImage(
                   imageUrl: testImageUrl,
-                  placeholder: const Text('Loading...'),
+                  placeholder: Text('Loading...'),
                 ),
               ],
             ),
@@ -39,10 +39,10 @@ void main() {
 
     testWidgets('loads image when becomes visible', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: LazyCacheImage(
             imageUrl: testImageUrl,
-            placeholder: const Text('Loading...'),
+            placeholder: Text('Loading...'),
           ),
         ),
       );
@@ -53,10 +53,10 @@ void main() {
 
     testWidgets('shows error widget on error', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: LazyCacheImage(
             imageUrl: 'invalid_url',
-            errorWidget: const Text('Error!'),
+            errorWidget: Text('Error!'),
           ),
         ),
       );
@@ -67,7 +67,7 @@ void main() {
 
     testWidgets('handles SVG images correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: LazyCacheImage(
             imageUrl: testSvgUrl,
           ),
