@@ -16,8 +16,8 @@ void main() {
   });
 
   group('LazyCacheImage Widget Tests', () {
-    
-    testWidgets('shows placeholder when not visible', (WidgetTester tester) async {
+    testWidgets('shows placeholder when not visible',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: SingleChildScrollView(
@@ -38,7 +38,8 @@ void main() {
       expect(find.byType(CachedNetworkImage), findsNothing);
     });
 
-    testWidgets('loads image when becomes visible', (WidgetTester tester) async {
+    testWidgets('loads image when becomes visible',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: LazyCacheImage(
