@@ -3,6 +3,7 @@ import 'package:imageflow/imageflow.dart';
 import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
+import 'pages/main_page.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
         ),
       ),
-      home: const MyHomePage(),
+      home: const MainPage(),
     );
   }
 }
