@@ -47,7 +47,7 @@ class _ImagePageState extends State<ImagePage> {
     if (widget.isOffline && !_isCached) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cannot load high quality image in offline mode - Image not cached'),
+          content: Text('Cannot load image in offline mode - Image not cached'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -69,13 +69,16 @@ class _ImagePageState extends State<ImagePage> {
     });
 
     try {
-      setState(() {
-        _isHighQuality = !_isHighQuality;
-      });
-
-      if (_isHighQuality) {
+      if (!_isHighQuality) {
+        // Only try to cache when switching to high quality
         await _cacheProvider.getFile(widget.image.url);
         await _checkImageCache();
+      }
+      
+      if (mounted) {
+        setState(() {
+          _isHighQuality = !_isHighQuality;
+        });
       }
     } catch (e) {
       developer.log('Error loading high quality image: $e');
@@ -216,10 +219,78 @@ class _ImagePageState extends State<ImagePage> {
           enableAdaptiveLoading: widget.enableAdaptiveLoading,
           enableOfflineMode: widget.enableOfflineMode,
           placeholder: _buildLoadingIndicator(),
-          errorWidget: _buildErrorWidget(),
+          errorWidget: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  widget.isOffline ? Icons.cloud_off : Icons.error_outline,
+                  color: widget.isOffline ? Colors.orange : Colors.red,
+                  size: 48,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.isOffline && !_isCached
+                      ? 'Image not available offline\nNot cached'
+                      : 'Failed to load image',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: widget.isOffline ? Colors.orange : Colors.red,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                if (!widget.isOffline || _isCached)
+                  ElevatedButton.icon(
+                    onPressed: _retryLoading,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _retryLoading() async {
+    if (widget.isOffline && !_isCached) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot load image in offline mode - Image not cached'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _checkImageCache();
+      if (!_isCached && !widget.isOffline) {
+        await _cacheProvider.getFile(widget.image.url);
+        await _checkImageCache();
+      }
+    } catch (e) {
+      developer.log('Error retrying image load: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading image: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Widget _buildLoadingIndicator() {
@@ -234,34 +305,6 @@ class _ImagePageState extends State<ImagePage> {
           Text(
             _isHighQuality ? 'Loading High Quality' : 'Loading Preview',
             style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 48,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Failed to load image',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.red,
-                ),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton.icon(
-            onPressed: _toggleImageQuality,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
           ),
         ],
       ),
