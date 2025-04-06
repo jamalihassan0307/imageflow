@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports, prefer_final_fields, unused_element
+
 import 'package:flutter/material.dart';
 import 'package:imageflow/imageflow.dart';
 import 'image_page.dart';

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, implementation_imports
+
 import 'package:flutter/material.dart';
 import 'package:imageflow/imageflow.dart';
 import 'main_page.dart';
