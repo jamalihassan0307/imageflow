@@ -29,8 +29,8 @@ class ImageConfig {
   /// Maximum height to load the image at
   final double? maxHeight;
 
-  /// Whether to prefetch this image
-  final bool shouldPrefetch;
+  /// Whether to store this image in permanent cache
+  final bool storeInCache;
 
   /// Whether to attempt loading from cache first in offline mode
   final bool enableOfflineMode;
@@ -45,7 +45,7 @@ class ImageConfig {
     this.cacheDuration = const Duration(days: 30),
     this.maxWidth,
     this.maxHeight,
-    this.shouldPrefetch = false,
+    this.storeInCache = false,
     this.enableOfflineMode = true,
   });
 
@@ -60,7 +60,7 @@ class ImageConfig {
     Duration? cacheDuration,
     double? maxWidth,
     double? maxHeight,
-    bool? shouldPrefetch,
+    bool? storeInCache,
     bool? enableOfflineMode,
   }) {
     return ImageConfig(
@@ -74,7 +74,7 @@ class ImageConfig {
       cacheDuration: cacheDuration ?? this.cacheDuration,
       maxWidth: maxWidth ?? this.maxWidth,
       maxHeight: maxHeight ?? this.maxHeight,
-      shouldPrefetch: shouldPrefetch ?? this.shouldPrefetch,
+      storeInCache: storeInCache ?? this.storeInCache,
       enableOfflineMode: enableOfflineMode ?? this.enableOfflineMode,
     );
   }
