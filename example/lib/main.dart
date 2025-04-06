@@ -4,13 +4,11 @@ import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
-// Add HTTP override for debug mode
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-    client.connectionTimeout = const Duration(seconds: 30);
+    final client = super.createHttpClient(context);
+    client.badCertificateCallback = (cert, host, port) => true;
     return client;
   }
 }
