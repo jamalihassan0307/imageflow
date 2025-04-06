@@ -80,7 +80,8 @@ class _MainPageState extends State<MainPage> {
                     max: 1.0,
                     divisions: 10,
                     label: '${(_visibilityFraction * 100).round()}%',
-                    onChanged: (value) => setState(() => _visibilityFraction = value),
+                    onChanged: (value) =>
+                        setState(() => _visibilityFraction = value),
                   ),
                 ),
               ],
@@ -92,7 +93,8 @@ class _MainPageState extends State<MainPage> {
                     title: const Text('Adaptive Loading'),
                     subtitle: const Text('Low to High Quality'),
                     value: _enableAdaptiveLoading,
-                    onChanged: (value) => setState(() => _enableAdaptiveLoading = value),
+                    onChanged: (value) =>
+                        setState(() => _enableAdaptiveLoading = value),
                   ),
                 ),
                 Expanded(
@@ -100,7 +102,8 @@ class _MainPageState extends State<MainPage> {
                     title: const Text('Offline Mode'),
                     subtitle: const Text('Cache Support'),
                     value: _enableOfflineMode,
-                    onChanged: (value) => setState(() => _enableOfflineMode = value),
+                    onChanged: (value) =>
+                        setState(() => _enableOfflineMode = value),
                   ),
                 ),
               ],
@@ -157,7 +160,7 @@ class _MainPageState extends State<MainPage> {
                 tag: image.url,
                 child: LazyCacheImage(
                   imageUrl: image.url,
-                  lowResUrl: _enableAdaptiveLoading 
+                  lowResUrl: _enableAdaptiveLoading
                       ? ImageUtils.getLowQualityUrl(image.url)
                       : null,
                   fit: BoxFit.cover,
@@ -235,7 +238,8 @@ class _MainPageState extends State<MainPage> {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Cache size: ${(size / 1024 / 1024).toStringAsFixed(2)} MB'),
+                      content: Text(
+                          'Cache size: ${(size / 1024 / 1024).toStringAsFixed(2)} MB'),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -302,4 +306,4 @@ final _demoImages = [
     title: 'Technology',
     description: 'Modern tech and innovation',
   ),
-]; 
+];

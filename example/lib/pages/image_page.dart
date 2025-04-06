@@ -246,7 +246,8 @@ class _ImagePageState extends State<ImagePage> {
                 TextButton.icon(
                   onPressed: _toggleImageQuality,
                   icon: Icon(_isHighQuality ? Icons.hd : Icons.sd),
-                  label: Text(_isHighQuality ? 'Switch to Low' : 'Switch to High'),
+                  label:
+                      Text(_isHighQuality ? 'Switch to Low' : 'Switch to High'),
                 ),
             ],
           ),
@@ -254,4 +255,4 @@ class _ImagePageState extends State<ImagePage> {
       ),
     );
   }
-} 
+}
