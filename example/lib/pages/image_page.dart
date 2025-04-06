@@ -47,7 +47,17 @@ class _ImagePageState extends State<ImagePage> {
     if (widget.isOffline && !_isCached) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cannot load high quality image in offline mode'),
+          content: Text('Cannot load high quality image in offline mode - Image not cached'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (widget.isOffline && !await ImageUtils.hasInternetConnection()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No internet connection available'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -56,10 +66,13 @@ class _ImagePageState extends State<ImagePage> {
 
     setState(() {
       _isLoading = true;
-      _isHighQuality = !_isHighQuality;
     });
 
     try {
+      setState(() {
+        _isHighQuality = !_isHighQuality;
+      });
+
       if (_isHighQuality) {
         await _cacheProvider.getFile(widget.image.url);
         await _checkImageCache();
@@ -67,6 +80,9 @@ class _ImagePageState extends State<ImagePage> {
     } catch (e) {
       developer.log('Error loading high quality image: $e');
       if (mounted) {
+        setState(() {
+          _isHighQuality = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error loading high quality image: $e'),
@@ -76,7 +92,9 @@ class _ImagePageState extends State<ImagePage> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
