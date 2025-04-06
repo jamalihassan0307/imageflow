@@ -8,16 +8,30 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     final client = super.createHttpClient(context);
-    client.badCertificateCallback = (cert, host, port) => true;
+    client.badCertificateCallback = (_, __, ___) => true;
+    client.connectionTimeout = const Duration(seconds: 30);
+    client.idleTimeout = const Duration(seconds: 30);
     return client;
   }
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   if (kDebugMode) {
     HttpOverrides.global = MyHttpOverrides();
+    developer.log('Debug mode: Using custom HTTP client configuration');
   }
+
+  // Clear any existing cache on startup
+  try {
+    final cacheProvider = CacheProvider();
+    await cacheProvider.clearAllCache();
+    developer.log('Cache cleared on startup');
+  } catch (e) {
+    developer.log('Error clearing cache on startup: $e');
+  }
+
   runApp(const MyApp());
 }
 
